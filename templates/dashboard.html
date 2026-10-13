@@ -1,0 +1,593 @@
+{% extends 'base.html' %}
+
+{% block title %}EV Intelligence Cockpit - Dashboard{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <!-- Header & Driver Telemetry Stats -->
+    <div class="neo-card mb-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+                <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Driver Cockpit</span>
+                <h2 class="fw-extrabold text-neo-primary mb-1">
+                    Welcome back, {{ username }}
+                </h2>
+                {% if default_vehicle %}
+                    <div class="d-flex align-items-center gap-2 mt-2">
+                        <span class="neo-badge text-neo-emerald"><i class="bi bi-star-fill"></i> Default EV:</span>
+                        <strong class="text-neo-primary">{{ default_vehicle.manufacturer }} {{ default_vehicle.model }}</strong>
+                        <span class="text-neo-muted">({{ default_vehicle.variant_name }} &bull; {{ default_vehicle.battery_capacity_kwh }} kWh)</span>
+                    </div>
+                {% else %}
+                    <p class="text-neo-muted small mb-0 mt-1">No default EV set yet. Select a vehicle below and add it to your personal Garage.</p>
+                {% endif %}
+            </div>
+
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ url_for('garage') }}" class="btn-neo btn-neo-pill">
+                    <i class="bi bi-car-front-fill text-neo-accent"></i> My Garage ({% if saved_vehicles %}{{ saved_vehicles|length }}{% else %}0{% endif %})
+                </a>
+                <a href="{{ url_for('history') }}" class="btn-neo btn-neo-pill">
+                    <i class="bi bi-clock-history text-neo-emerald"></i> My History ({{ total_predictions }})
+                </a>
+                <a href="{{ url_for('profile') }}" class="btn-neo btn-neo-pill">
+                    <i class="bi bi-person-circle"></i> Profile
+                </a>
+            </div>
+        </div>
+
+        <!-- Personal Driver Quick Stats -->
+        <div class="row g-3 mt-3 pt-3 border-top border-secondary-subtle">
+            <div class="col-6 col-md-3">
+                <div class="neo-inset-box neo-inset-box-sm text-center">
+                    <span class="small text-neo-muted d-block">Saved in Garage</span>
+                    <span class="fs-4 fw-bold text-neo-primary">{{ saved_vehicles|length if saved_vehicles else 0 }}</span>
+                    <span class="small text-neo-muted"> EV(s)</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="neo-inset-box neo-inset-box-sm text-center">
+                    <span class="small text-neo-muted d-block">Total Predictions</span>
+                    <span class="fs-4 fw-bold text-neo-accent">{{ total_predictions }}</span>
+                    <span class="small text-neo-muted"> Trips</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="neo-inset-box neo-inset-box-sm text-center">
+                    <span class="small text-neo-muted d-block">Latest Prediction</span>
+                    <span class="fs-4 fw-bold text-neo-emerald">{% if latest_prediction %}{{ latest_prediction.predicted_range }}{% else %}&mdash;{% endif %}</span>
+                    <span class="small text-neo-muted"> km</span>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="neo-inset-box neo-inset-box-sm text-center">
+                    <span class="small text-neo-muted d-block">Active ML Model</span>
+                    <span class="fs-6 fw-bold text-neo-primary d-block mt-1">HistGradient</span>
+                    <span class="small text-neo-emerald fw-semibold">R² = {{ metadata.winning_metrics.r2_score | default('0.9664') }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Load from My Garage (If User Has Saved EVs) -->
+    {% if saved_vehicles %}
+        <div class="neo-card mb-4 py-3 px-4">
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
+                <div class="d-flex align-items-center gap-2">
+                    <i class="bi bi-lightning-charge-fill text-neo-accent fs-5"></i>
+                    <span class="fw-bold small text-neo-primary">Quick Load From Your Garage:</span>
+                </div>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for sv in saved_vehicles %}
+                        <button type="button" class="btn-neo btn-neo-pill small {% if default_vehicle and default_vehicle.id == sv.id %}active text-neo-accent{% endif %}" onclick="loadSavedVehicle('{{ sv.variant_id }}')">
+                            <i class="bi bi-ev-front me-1"></i> {{ sv.manufacturer }} {{ sv.model }} {% if sv.is_default %}&bull; Default{% endif %}
+                        </button>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Prediction Form -->
+    <form method="POST" action="{{ url_for('predict') }}" id="predictionForm">
+        <div class="row g-4">
+
+            <!-- Left Column: Vehicle Selection & Verified Specifications -->
+            <div class="col-lg-5">
+
+                <!-- Section 1: Vehicle Selection -->
+                <div class="neo-card mb-4">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="neo-badge neo-badge-inset text-neo-accent fw-extrabold">1</span>
+                        <h5 class="fw-bold text-neo-primary mb-0">Select Electric Vehicle</h5>
+                    </div>
+                    <p class="text-neo-secondary small mb-3">Select brand, model, and trim to automatically load OEM battery, motor, and aerodynamic parameters.</p>
+
+                    <div class="neo-input-group mb-3">
+                        <label for="manufacturerSelect" class="neo-label">Manufacturer</label>
+                        <select class="neo-select" id="manufacturerSelect" required onchange="onManufacturerChanged()">
+                            <option value="" disabled selected>-- Select Manufacturer --</option>
+                            {% for mfg in catalogue.manufacturers %}
+                                <option value="{{ mfg.name }}">{{ mfg.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="neo-input-group mb-3">
+                        <label for="modelSelect" class="neo-label">Vehicle Model</label>
+                        <select class="neo-select" id="modelSelect" required disabled onchange="onModelChanged()">
+                            <option value="" disabled selected>-- Select Model --</option>
+                        </select>
+                    </div>
+
+                    <div class="neo-input-group mb-2">
+                        <label for="variantSelect" class="neo-label">Variant / Trim</label>
+                        <select class="neo-select" id="variantSelect" name="variant_id" required disabled onchange="onVariantChanged()">
+                            <option value="" disabled selected>-- Select Variant --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Section 2: Auto-Loaded Vehicle Specifications Panel -->
+                <div class="neo-card">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="neo-badge neo-badge-inset text-neo-emerald fw-extrabold">2</span>
+                            <h5 class="fw-bold text-neo-primary mb-0">Vehicle Specifications</h5>
+                        </div>
+                        <span class="neo-badge neo-badge-inset text-neo-muted small" id="specStatusBadge">Awaiting selection</span>
+                    </div>
+
+                    <!-- Placeholder -->
+                    <div id="specsLoadingPlaceholder" class="neo-inset-box text-center py-4 text-neo-muted small">
+                        <i class="bi bi-car-front fs-2 d-block mb-2 text-neo-accent"></i>
+                        Select a vehicle variant above to inspect verified OEM battery, motor, weight, and drag specifications.
+                    </div>
+
+                    <!-- Active Specs Container -->
+                    <div id="specsContainer" class="d-none">
+                        <div class="neo-table-wrapper mb-3">
+                            <table class="neo-table">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-neo-muted w-50">Battery Capacity</td>
+                                        <td class="fw-bold text-neo-primary" id="spec_capacity">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-neo-muted">Battery Chemistry</td>
+                                        <td class="fw-semibold text-neo-primary" id="spec_chemistry">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-neo-muted">Peak Motor Power</td>
+                                        <td class="fw-semibold text-neo-primary" id="spec_power">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-neo-muted">Curb Weight</td>
+                                        <td class="fw-semibold text-neo-primary" id="spec_weight">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-neo-muted">Drivetrain</td>
+                                        <td class="fw-semibold text-neo-primary" id="spec_drivetrain">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-neo-muted">Body Architecture</td>
+                                        <td class="fw-semibold text-neo-primary" id="spec_body">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-neo-muted">Certified Lab Range</td>
+                                        <td class="fw-bold text-neo-emerald" id="spec_official_range">-</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Add to Garage CTA inside specs panel -->
+                        <div class="text-center pt-2">
+                            <button type="button" class="btn-neo btn-neo-pill small w-100" id="btnSaveToGarage" onclick="saveCurrentToGarage()">
+                                <i class="bi bi-bookmark-plus text-neo-accent"></i> Add This Vehicle to My Garage
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Tactile Environmental & Driving Condition Controls -->
+            <div class="col-lg-7">
+                <div class="neo-card">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <span class="neo-badge neo-badge-inset text-neo-accent fw-extrabold">3</span>
+                        <h5 class="fw-bold text-neo-primary mb-0">Current Trip & Environmental Conditions</h5>
+                    </div>
+                    <p class="text-neo-secondary small mb-4">Set real-time driving conditions. Our ML model evaluates cubic aerodynamic resistance, thermal HVAC power draw, and terrain gradient loads.</p>
+
+                    <!-- Row 1: Battery SoC & Average Speed Sliders -->
+                    <div class="row g-3 mb-3">
+                        <!-- Battery State of Charge -->
+                        <div class="col-md-6">
+                            <div class="neo-slider-wrapper">
+                                <div class="neo-slider-header">
+                                    <label class="neo-label mb-0" for="battery_percentage_slider">
+                                        <i class="bi bi-battery-half text-neo-emerald me-1"></i> Battery SoC
+                                    </label>
+                                    <span class="neo-slider-value" id="val_battery_percentage">80%</span>
+                                </div>
+                                <input type="range" class="neo-range-slider" id="battery_percentage_slider" min="5" max="100" step="1" value="80" oninput="syncSlider('battery_percentage', this.value, '%')">
+                                <input type="hidden" id="battery_percentage" name="battery_percentage" value="80">
+                                <div class="d-flex justify-content-between small text-neo-muted mt-1">
+                                    <span>5% (Depleted)</span>
+                                    <span>100% (Full)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Average Trip Speed -->
+                        <div class="col-md-6">
+                            <div class="neo-slider-wrapper">
+                                <div class="neo-slider-header">
+                                    <label class="neo-label mb-0" for="average_speed_slider">
+                                        <i class="bi bi-speedometer text-neo-accent me-1"></i> Average Speed
+                                    </label>
+                                    <span class="neo-slider-value" id="val_average_speed">65 km/h</span>
+                                </div>
+                                <input type="range" class="neo-range-slider" id="average_speed_slider" min="10" max="150" step="1" value="65" oninput="syncSlider('average_speed', this.value, ' km/h')">
+                                <input type="hidden" id="average_speed" name="average_speed" value="65">
+                                <div class="d-flex justify-content-between small text-neo-muted mt-1">
+                                    <span>10 km/h (City)</span>
+                                    <span>150 km/h (Highway)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 2: Ambient Temperature Slider -->
+                    <div class="mb-3">
+                        <div class="neo-slider-wrapper">
+                            <div class="neo-slider-header">
+                                <label class="neo-label mb-0" for="ambient_temperature_slider">
+                                    <i class="bi bi-thermometer-half text-neo-warning me-1"></i> Ambient Temperature
+                                </label>
+                                <span class="neo-slider-value" id="val_ambient_temperature">22°C</span>
+                            </div>
+                            <input type="range" class="neo-range-slider" id="ambient_temperature_slider" min="-20" max="50" step="1" value="22" oninput="syncSlider('ambient_temperature', this.value, '°C')">
+                            <input type="hidden" id="ambient_temperature" name="ambient_temperature" value="22">
+                            <div class="d-flex justify-content-between small text-neo-muted mt-1">
+                                <span>-20°C (Freezing Winter)</span>
+                                <span class="text-neo-emerald fw-semibold">21°C (Optimal)</span>
+                                <span>50°C (Extreme Heat)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Row 3: Traffic Flow Condition (Segmented Buttons) -->
+                    <div class="mb-3">
+                        <label class="neo-label"><i class="bi bi-stoplights text-neo-accent me-1"></i> Traffic Flow Condition</label>
+                        <div class="neo-segmented-group" id="trafficGroup">
+                            <button type="button" class="neo-segment-btn active" data-val="Low/Highway" onclick="setSegmented('traffic_condition', 'Low/Highway', this)">
+                                Low / Highway (Cruising)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Moderate/City" onclick="setSegmented('traffic_condition', 'Moderate/City', this)">
+                                Moderate / City (Normal)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Heavy/Stop-and-Go" onclick="setSegmented('traffic_condition', 'Heavy/Stop-and-Go', this)">
+                                Heavy / Stop-and-Go
+                            </button>
+                        </div>
+                        <input type="hidden" id="traffic_condition" name="traffic_condition" value="Low/Highway">
+                    </div>
+
+                    <!-- Row 4: Route Terrain Profile (Segmented Buttons) -->
+                    <div class="mb-3">
+                        <label class="neo-label"><i class="bi bi-triangle text-neo-accent me-1"></i> Route Terrain Profile</label>
+                        <div class="neo-segmented-group" id="terrainGroup">
+                            <button type="button" class="neo-segment-btn active" data-val="Flat" onclick="setSegmented('terrain', 'Flat', this)">
+                                Flat (Expressway)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Hilly" onclick="setSegmented('terrain', 'Hilly', this)">
+                                Hilly (Rolling Grade ~1.6%)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Mountainous" onclick="setSegmented('terrain', 'Mountainous', this)">
+                                Mountainous (Steep Incline)
+                            </button>
+                        </div>
+                        <input type="hidden" id="terrain" name="terrain" value="Flat">
+                    </div>
+
+                    <!-- Row 5: Driving Style Profile (Segmented Buttons) -->
+                    <div class="mb-3">
+                        <label class="neo-label"><i class="bi bi-compass text-neo-accent me-1"></i> Driving Style Profile</label>
+                        <div class="neo-segmented-group" id="styleGroup">
+                            <button type="button" class="neo-segment-btn" data-val="Eco/Gentle" onclick="setSegmented('driving_style', 'Eco/Gentle', this)">
+                                Eco / Gentle (Max Regen)
+                            </button>
+                            <button type="button" class="neo-segment-btn active" data-val="Normal" onclick="setSegmented('driving_style', 'Normal', this)">
+                                Normal (Balanced)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Aggressive" onclick="setSegmented('driving_style', 'Aggressive', this)">
+                                Aggressive / Sport
+                            </button>
+                        </div>
+                        <input type="hidden" id="driving_style" name="driving_style" value="Normal">
+                    </div>
+
+                    <!-- Row 6: HVAC / Cabin Climate Draw -->
+                    <div class="mb-3">
+                        <label class="neo-label"><i class="bi bi-fan text-neo-accent me-1"></i> Cabin HVAC / Climate Draw</label>
+                        <div class="neo-segmented-group" id="hvacGroup">
+                            <button type="button" class="neo-segment-btn" data-val="Off" onclick="setSegmented('hvac_usage', 'Off', this)">
+                                Off (Natural Flow)
+                            </button>
+                            <button type="button" class="neo-segment-btn active" data-val="Moderate" onclick="setSegmented('hvac_usage', 'Moderate', this)">
+                                Moderate (1.5 kW Draw)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="High" onclick="setSegmented('hvac_usage', 'High', this)">
+                                High / Max (3.5 kW Draw)
+                            </button>
+                        </div>
+                        <input type="hidden" id="hvac_usage" name="hvac_usage" value="Moderate">
+                    </div>
+
+                    <!-- Row 7: Stepper Controls for Passengers & Battery Age -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="neo-label"><i class="bi bi-people text-neo-accent me-1"></i> Passenger Occupants</label>
+                            <div class="neo-stepper">
+                                <button type="button" class="neo-stepper-btn" onclick="stepVal('passenger_count', -1, 1, 5)">&minus;</button>
+                                <div class="neo-stepper-display" id="display_passenger_count">1 Person</div>
+                                <button type="button" class="neo-stepper-btn" onclick="stepVal('passenger_count', 1, 1, 5)">&plus;</button>
+                            </div>
+                            <input type="hidden" id="passenger_count" name="passenger_count" value="1">
+                            <small class="text-neo-muted d-block mt-1">Each passenger adds 75 kg payload mass</small>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="neo-label"><i class="bi bi-clock-history text-neo-accent me-1"></i> Battery Age (Degradation)</label>
+                            <div class="neo-stepper">
+                                <button type="button" class="neo-stepper-btn" onclick="stepValFloat('battery_age', -0.5, 0.0, 10.0)">&minus;</button>
+                                <div class="neo-stepper-display" id="display_battery_age">1.0 Years</div>
+                                <button type="button" class="neo-stepper-btn" onclick="stepValFloat('battery_age', 0.5, 0.0, 10.0)">&plus;</button>
+                            </div>
+                            <input type="hidden" id="battery_age" name="battery_age" value="1.0">
+                            <small class="text-neo-muted d-block mt-1">~1.8% annual battery capacity fade</small>
+                        </div>
+                    </div>
+
+                    <!-- Row 8: Tyre Pressure Status -->
+                    <div class="mb-4">
+                        <label class="neo-label"><i class="bi bi-disc text-neo-accent me-1"></i> Tyre Inflation Pressure</label>
+                        <div class="neo-segmented-group" id="tyreGroup">
+                            <button type="button" class="neo-segment-btn active" data-val="Normal" onclick="setSegmented('tyre_pressure_status', 'Normal', this)">
+                                Normal (Optimal PSI)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Low -10%" onclick="setSegmented('tyre_pressure_status', 'Low -10%', this)">
+                                Low (-10% PSI)
+                            </button>
+                            <button type="button" class="neo-segment-btn" data-val="Very Low -20%" onclick="setSegmented('tyre_pressure_status', 'Very Low -20%', this)">
+                                Very Low (-20% PSI)
+                            </button>
+                        </div>
+                        <input type="hidden" id="tyre_pressure_status" name="tyre_pressure_status" value="Normal">
+                    </div>
+
+                    <!-- Predict Action Button -->
+                    <div class="pt-3 border-top border-secondary-subtle">
+                        <button type="submit" class="btn-neo btn-neo-gradient w-100 py-3 fs-5" id="submitBtn">
+                            <i class="bi bi-lightning-charge-fill"></i> Predict Real-World Remaining Range
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </form>
+
+    <!-- Hidden form for saving vehicle directly to garage -->
+    <form id="saveToGarageForm" method="POST" action="{{ url_for('garage_add') }}" style="display:none;">
+        <input type="hidden" name="variant_id" id="save_variant_id">
+    </form>
+
+    <!-- Model Performance Visualizations -->
+    <div class="neo-card mt-5">
+        <h5 class="fw-bold text-neo-primary mb-3">
+            <i class="bi bi-graph-up-arrow text-neo-accent me-2"></i> ML Model Telemetry & Benchmarks
+        </h5>
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="neo-inset-box text-center">
+                    <span class="small fw-bold text-neo-primary d-block mb-2">Model Comparison (R² vs RMSE Across 6 Algorithms)</span>
+                    <img src="{{ url_for('static', filename='images/model_comparison.png') }}" class="img-fluid rounded neo-card p-1" alt="Model Comparison">
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="neo-inset-box text-center">
+                    <span class="small fw-bold text-neo-primary d-block mb-2">Actual vs Predicted Fit (HistGradientBoosting R² = {{ metadata.winning_metrics.r2_score | default('0.9664') }})</span>
+                    <img src="{{ url_for('static', filename='images/actual_vs_predicted.png') }}" class="img-fluid rounded neo-card p-1" alt="Actual vs Predicted">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Load verified catalogue directly from backend
+const catalogue = {{ catalogue | tojson }};
+const defaultVariantId = "{{ default_vehicle.variant_id if default_vehicle else '' }}";
+
+function onManufacturerChanged(targetModel = null, targetVariant = null) {
+    const mfgSelect = document.getElementById('manufacturerSelect');
+    const modelSelect = document.getElementById('modelSelect');
+    const variantSelect = document.getElementById('variantSelect');
+    const selectedMfg = mfgSelect.value;
+
+    modelSelect.innerHTML = '<option value="" disabled selected>-- Select Model --</option>';
+    variantSelect.innerHTML = '<option value="" disabled selected>-- Select Variant --</option>';
+    variantSelect.disabled = true;
+    hideSpecs();
+
+    const mfgData = catalogue.manufacturers.find(m => m.name === selectedMfg);
+    if (mfgData && mfgData.models) {
+        mfgData.models.forEach(mod => {
+            const opt = document.createElement('option');
+            opt.value = mod.name;
+            opt.textContent = mod.name;
+            if (targetModel && mod.name === targetModel) opt.selected = true;
+            modelSelect.appendChild(opt);
+        });
+        modelSelect.disabled = false;
+
+        if (targetModel) {
+            onModelChanged(targetVariant);
+        }
+    }
+}
+
+function onModelChanged(targetVariant = null) {
+    const mfgSelect = document.getElementById('manufacturerSelect');
+    const modelSelect = document.getElementById('modelSelect');
+    const variantSelect = document.getElementById('variantSelect');
+
+    const selectedMfg = mfgSelect.value;
+    const selectedModel = modelSelect.value;
+
+    variantSelect.innerHTML = '<option value="" disabled selected>-- Select Variant --</option>';
+    hideSpecs();
+
+    const mfgData = catalogue.manufacturers.find(m => m.name === selectedMfg);
+    if (mfgData) {
+        const modelData = mfgData.models.find(m => m.name === selectedModel);
+        if (modelData && modelData.variants) {
+            modelData.variants.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.textContent = v.name;
+                if (targetVariant && v.id === targetVariant) opt.selected = true;
+                variantSelect.appendChild(opt);
+            });
+            variantSelect.disabled = false;
+
+            if (targetVariant) {
+                onVariantChanged();
+            }
+        }
+    }
+}
+
+function onVariantChanged() {
+    const variantSelect = document.getElementById('variantSelect');
+    const variantId = variantSelect.value;
+    if (!variantId) return;
+
+    document.getElementById('save_variant_id').value = variantId;
+
+    fetch(`/api/vehicle-specs/${variantId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                console.error(data.error);
+                return;
+            }
+            displaySpecs(data);
+        })
+        .catch(err => console.error("Error fetching vehicle specs:", err));
+}
+
+function displaySpecs(data) {
+    document.getElementById('specsLoadingPlaceholder').classList.add('d-none');
+    document.getElementById('specsContainer').classList.remove('d-none');
+
+    document.getElementById('spec_capacity').textContent = `${data.battery_capacity_kwh} kWh`;
+    document.getElementById('spec_chemistry').textContent = `${data.battery_chemistry} (Lithium)`;
+    document.getElementById('spec_power').textContent = `${data.motor_power_kw} kW (${Math.round(data.motor_power_kw * 1.341)} hp)`;
+    document.getElementById('spec_weight').textContent = `${data.curb_weight_kg} kg (Curb)`;
+    document.getElementById('spec_drivetrain').textContent = `${data.drivetrain}`;
+    document.getElementById('spec_body').textContent = `${data.body_type}`;
+    document.getElementById('spec_official_range').textContent = `${data.official_range_km} km (${data.range_test_cycle})`;
+
+    const badge = document.getElementById('specStatusBadge');
+    badge.textContent = "Verified Specifications Loaded";
+    badge.className = "neo-badge neo-badge-inset text-neo-emerald small";
+}
+
+function hideSpecs() {
+    document.getElementById('specsLoadingPlaceholder').classList.remove('d-none');
+    document.getElementById('specsContainer').classList.add('d-none');
+    const badge = document.getElementById('specStatusBadge');
+    badge.textContent = "Awaiting selection";
+    badge.className = "neo-badge neo-badge-inset text-neo-muted small";
+}
+
+// Quick load a vehicle by variant ID
+function loadSavedVehicle(variantId) {
+    for (const mfg of catalogue.manufacturers) {
+        for (const model of mfg.models) {
+            for (const v of model.variants) {
+                if (v.id === variantId) {
+                    document.getElementById('manufacturerSelect').value = mfg.name;
+                    onManufacturerChanged(model.name, v.id);
+                    return;
+                }
+            }
+        }
+    }
+}
+
+// Add currently selected vehicle to user garage
+function saveCurrentToGarage() {
+    const vId = document.getElementById('variantSelect').value;
+    if (!vId) {
+        alert('Please select a vehicle variant first.');
+        return;
+    }
+    document.getElementById('save_variant_id').value = vId;
+    document.getElementById('saveToGarageForm').submit();
+}
+
+// Tactile slider synchronization
+function syncSlider(fieldId, val, unit) {
+    document.getElementById(fieldId).value = val;
+    document.getElementById(`val_${fieldId}`).textContent = `${val}${unit}`;
+}
+
+// Segmented button switcher
+function setSegmented(fieldId, val, btnElem) {
+    document.getElementById(fieldId).value = val;
+    const parent = btnElem.parentElement;
+    parent.querySelectorAll('.neo-segment-btn').forEach(b => b.classList.remove('active'));
+    btnElem.classList.add('active');
+}
+
+// Stepper control
+function stepVal(fieldId, delta, minVal, maxVal) {
+    const input = document.getElementById(fieldId);
+    let cur = parseInt(input.value) + delta;
+    if (cur < minVal) cur = minVal;
+    if (cur > maxVal) cur = maxVal;
+    input.value = cur;
+    document.getElementById(`display_${fieldId}`).textContent = `${cur} Person${cur > 1 ? 's' : ''}`;
+}
+
+function stepValFloat(fieldId, delta, minVal, maxVal) {
+    const input = document.getElementById(fieldId);
+    let cur = parseFloat(input.value) + delta;
+    cur = Math.round(cur * 10) / 10;
+    if (cur < minVal) cur = minVal;
+    if (cur > maxVal) cur = maxVal;
+    input.value = cur.toFixed(1);
+    document.getElementById(`display_${fieldId}`).textContent = `${cur.toFixed(1)} Years`;
+}
+
+// Automatically load default EV on dashboard open if available, otherwise first option
+window.addEventListener('DOMContentLoaded', () => {
+    if (defaultVariantId) {
+        loadSavedVehicle(defaultVariantId);
+    } else {
+        loadSavedVehicle('tata_nexon_empowered_lr');
+    }
+});
+</script>
+{% endblock %}

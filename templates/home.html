@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+
+{% block title %}Intelligent EV Range Prediction Platform - Machine Learning{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+
+    <!-- Hero Section: Neumorphic Cockpit Composition -->
+    <div class="row align-items-center g-5 py-4 mb-5">
+        <div class="col-lg-7">
+            <div class="neo-badge neo-badge-inset text-neo-emerald mb-3">
+                <i class="bi bi-lightning-charge-fill"></i> Multi-Vehicle BEV ML Architecture &bull; R² = {{ metadata.winning_metrics.r2_score | default('0.9664') }}
+            </div>
+            <h1 class="display-4 fw-extrabold text-neo-primary mb-3">
+                Predict Your EV's <span class="text-neo-accent">Real-World Range</span> With Intelligence.
+            </h1>
+            <p class="lead text-neo-secondary mb-4">
+                Laboratory chassis dynamometer ratings (WLTP/ARAI) fail to predict actual highway drag, sub-zero battery impedance, and cabin HVAC draw. Our high-precision <strong>HistGradientBoosting</strong> regression pipeline estimates true remaining kilometers across 28 verified production BEVs.
+            </p>
+            <div class="d-flex flex-wrap gap-3">
+                {% if is_authenticated %}
+                    <a href="{{ url_for('dashboard') }}" class="btn-neo btn-neo-gradient btn-lg px-4 py-3">
+                        <i class="bi bi-speedometer2"></i> Open EV Cockpit
+                    </a>
+                    <a href="{{ url_for('garage') }}" class="btn-neo btn-lg px-4 py-3">
+                        <i class="bi bi-car-front-fill text-neo-accent"></i> My EV Garage
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn-neo btn-neo-gradient btn-lg px-4 py-3">
+                        <i class="bi bi-rocket-takeoff-fill"></i> Start Range Prediction
+                    </a>
+                    <a href="{{ url_for('login') }}" class="btn-neo btn-lg px-4 py-3">
+                        <i class="bi bi-box-arrow-in-right text-neo-accent"></i> Driver Sign In
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="col-lg-5">
+            <!-- Neumorphic Interactive EV Live Preview Card -->
+            <div class="neo-card neo-card-lg">
+                <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-secondary-subtle">
+                    <span class="fw-bold text-neo-primary small text-uppercase letter-spacing-1">
+                        <i class="bi bi-cpu-fill text-neo-accent me-1"></i> Live BEV Telemetry Model
+                    </span>
+                    <span class="neo-badge neo-badge-inset text-neo-emerald">Verified OEM Specs</span>
+                </div>
+
+                <div class="neo-inset-box mb-3">
+                    <div class="small text-neo-muted">Selected EV Architecture</div>
+                    <div class="h5 fw-bold text-neo-primary mb-1">Tata Nexon EV Empowered+ LR</div>
+                    <div class="small text-neo-secondary">45.0 kWh LFP &bull; 106.6 kW Motor &bull; FWD SUV</div>
+                </div>
+
+                <div class="row g-2 mb-3">
+                    <div class="col-6">
+                        <div class="neo-inset-box neo-inset-box-sm">
+                            <span class="small text-neo-muted d-block">State of Charge</span>
+                            <span class="fw-bold text-neo-accent">85% SoC</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="neo-inset-box neo-inset-box-sm">
+                            <span class="small text-neo-muted d-block">Trip Speed</span>
+                            <span class="fw-bold text-neo-primary">65 km/h</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="neo-inset-box neo-inset-box-sm">
+                            <span class="small text-neo-muted d-block">Ambient Temp</span>
+                            <span class="fw-bold text-neo-primary">24°C (Normal)</span>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="neo-inset-box neo-inset-box-sm">
+                            <span class="small text-neo-muted d-block">HVAC Auxiliary</span>
+                            <span class="fw-bold text-neo-primary">Moderate (1.5 kW)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="neo-inset-box text-center py-3">
+                    <small class="text-neo-emerald text-uppercase fw-bold letter-spacing-1 d-block mb-1">Estimated Real-World Range</small>
+                    <div class="display-5 fw-extrabold text-neo-primary">
+                        248.5 <small class="fs-4 text-neo-muted">km</small>
+                    </div>
+                    <div class="text-neo-muted small mt-1">Certified Lab ARAI: 489 km (49.2% delta in city traffic)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core Features Section -->
+    <div class="mb-5">
+        <div class="text-center mb-4">
+            <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Engineered Precision</span>
+            <h2 class="display-6 fw-bold text-neo-primary">Physics-Grounded Machine Learning</h2>
+            <p class="text-neo-secondary max-w-700 mx-auto">Unlike static rolling averages, our ML model incorporates non-linear dynamic physics equations.</p>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="neo-card neo-card-hover h-100 text-center">
+                    <div class="neo-brand-icon mx-auto mb-3" style="width: 55px; height: 55px;">
+                        <i class="bi bi-car-front fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-neo-primary">Multi-Vehicle OEM Data</h5>
+                    <p class="text-neo-secondary small mb-0">
+                        Supports {{ manufacturers_count }} manufacturers (Tata, Mahindra, MG, Hyundai, Kia, BYD, Tesla, BMW) and {{ variants_count }} commercial variants with verified OEM battery capacity, motor power, and drag ratings.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="neo-card neo-card-hover h-100 text-center">
+                    <div class="neo-brand-icon mx-auto mb-3" style="width: 55px; height: 55px; color: var(--neo-emerald);">
+                        <i class="bi bi-sliders2-vertical fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-neo-primary">Multi-Factor Physics</h5>
+                    <p class="text-neo-secondary small mb-0">
+                        Evaluates cubic aerodynamic drag velocity ($P \propto v^3$), thermal HVAC direct auxiliary traction draw (1.5 to 3.5 kW), elevation incline energy, and stop-and-go kinetic inertia losses.
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-md-4">
+                <div class="neo-card neo-card-hover h-100 text-center">
+                    <div class="neo-brand-icon mx-auto mb-3" style="width: 55px; height: 55px; color: #8b5cf6;">
+                        <i class="bi bi-database-fill-check fs-3"></i>
+                    </div>
+                    <h5 class="fw-bold text-neo-primary">User Garage & History</h5>
+                    <p class="text-neo-secondary small mb-0">
+                        Authenticated user data isolation. Save your daily vehicles to your personal EV Garage, set your default car, and review historical prediction records with full environmental telemetry.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6-Model Benchmark Section -->
+    <div class="neo-card neo-card-lg mb-5">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-5">
+                <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Empirical Validation</span>
+                <h3 class="fw-bold text-neo-primary mb-3">6-Algorithm Regression Benchmark</h3>
+                <p class="text-neo-secondary small">
+                    Trained and benchmarked on 2,800 drive-cycle observation records across 28 real BEVs using an 80/20 train-test split. The <strong>HistGradientBoosting Regressor</strong> pipeline captured complex interactions with an average error of only 15.10 km.
+                </p>
+                <div class="neo-inset-box neo-inset-box-sm mb-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span class="fw-bold small text-neo-primary">Winning Model:</span>
+                        <span class="badge bg-primary px-2.5 py-1.5">{{ metadata.model_name | default('HistGradientBoosting') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span class="small text-neo-muted">R² Score:</span>
+                        <span class="fw-bold text-neo-emerald">{{ metadata.winning_metrics.r2_score | default('0.9664') }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-1">
+                        <span class="small text-neo-muted">Mean Absolute Error (MAE):</span>
+                        <span class="fw-bold text-neo-primary">{{ metadata.winning_metrics.mae_km | default('15.10') }} km</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="neo-table-wrapper">
+                    <table class="neo-table">
+                        <thead>
+                            <tr>
+                                <th>Algorithm</th>
+                                <th>MAE (km)</th>
+                                <th>RMSE (km)</th>
+                                <th>R² Score</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>HistGradientBoosting</td>
+                                <td class="fw-bold text-neo-emerald">15.10 km</td>
+                                <td>21.63 km</td>
+                                <td class="fw-bold text-neo-emerald">0.9664</td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-emerald">Active Winner</span></td>
+                            </tr>
+                            <tr>
+                                <td>XGBoost</td>
+                                <td>19.45 km</td>
+                                <td>27.85 km</td>
+                                <td>0.9444</td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-muted">Evaluated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Gradient Boosting</td>
+                                <td>23.81 km</td>
+                                <td>35.24 km</td>
+                                <td>0.9109</td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-muted">Evaluated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Random Forest</td>
+                                <td>27.30 km</td>
+                                <td>37.63 km</td>
+                                <td>0.8984</td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-muted">Evaluated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Decision Tree</td>
+                                <td>38.06 km</td>
+                                <td>56.16 km</td>
+                                <td>0.7738</td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-muted">Evaluated</span></td>
+                            </tr>
+                            <tr>
+                                <td>Linear Regression</td>
+                                <td>42.18 km</td>
+                                <td>58.11 km</td>
+                                <td>0.7578</td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-muted">Evaluated</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

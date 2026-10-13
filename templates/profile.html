@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Driver Profile - {{ user.username }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Profile Overview Card -->
+    <div class="neo-card neo-card-lg mb-4">
+        <div class="row align-items-center g-4">
+            <div class="col-md-2 text-center">
+                <div class="neo-brand-icon mx-auto" style="width: 88px; height: 88px;">
+                    <i class="bi bi-person-fill fs-1 text-neo-accent"></i>
+                </div>
+            </div>
+
+            <div class="col-md-6 text-center text-md-start">
+                <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Driver Profile</span>
+                <h2 class="fw-extrabold text-neo-primary mb-1">{{ user.username }}</h2>
+                <div class="text-neo-secondary small mb-2">
+                    <i class="bi bi-envelope me-1"></i> {{ user.email }}
+                </div>
+                <div class="text-neo-muted small">
+                    <i class="bi bi-calendar-check me-1"></i> Member since: <strong>{{ user.created_at.strftime('%B %Y') if user.created_at else 'September 2026' }}</strong>
+                </div>
+            </div>
+
+            <div class="col-md-4 text-center text-md-end">
+                <a href="{{ url_for('dashboard') }}" class="btn-neo btn-neo-gradient mb-2 d-inline-block">
+                    <i class="bi bi-speedometer2"></i> Open EV Cockpit
+                </a>
+                <div>
+                    <a href="{{ url_for('logout') }}" class="btn-neo btn-neo-pill text-neo-danger small">
+                        <i class="bi bi-box-arrow-right"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Personal Telemetry Statistics Row -->
+    <div class="row g-4 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="neo-stat-card">
+                <div class="neo-stat-num text-neo-accent">{{ total_predictions }}</div>
+                <div class="neo-stat-label">Total Predictions</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="neo-stat-card">
+                <div class="neo-stat-num text-neo-primary">{{ saved_vehicles|length if saved_vehicles else 0 }}</div>
+                <div class="neo-stat-label">EVs in Garage</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="neo-stat-card">
+                <div class="neo-stat-num text-neo-emerald">{{ average_range }}</div>
+                <div class="neo-stat-label">Avg Predicted (km)</div>
+            </div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="neo-stat-card">
+                <div class="neo-stat-num text-neo-primary" style="font-size: 1.4rem; padding-top: 0.5rem; min-height: 52px; display: flex; align-items: center; justify-content: center;">
+                    {% if default_vehicle %}{{ default_vehicle.model }}{% else %}&mdash;{% endif %}
+                </div>
+                <div class="neo-stat-label">Default Vehicle</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Garage Quick Overview -->
+    <div class="neo-card mb-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-neo-primary mb-0">
+                <i class="bi bi-car-front-fill text-neo-accent me-2"></i>My EV Garage Overview
+            </h5>
+            <a href="{{ url_for('garage') }}" class="btn-neo btn-neo-pill small">
+                Manage Garage <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        {% if saved_vehicles %}
+            <div class="row g-3">
+                {% for v in saved_vehicles %}
+                    <div class="col-md-4">
+                        <div class="neo-inset-box h-100">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="neo-badge neo-badge-inset text-neo-accent small">{{ v.manufacturer }}</span>
+                                {% if v.is_default %}
+                                    <span class="neo-badge text-neo-emerald small"><i class="bi bi-star-fill"></i> Default</span>
+                                {% endif %}
+                            </div>
+                            <strong class="text-neo-primary d-block">{{ v.model }}</strong>
+                            <span class="text-neo-muted small d-block mb-2">{{ v.variant_name }}</span>
+                            <div class="d-flex justify-content-between small text-neo-secondary pt-2 border-top border-secondary-subtle">
+                                <span>Pack: <strong>{{ v.battery_capacity_kwh }} kWh</strong></span>
+                                <span>Range: <strong class="text-neo-emerald">{{ v.official_range_km }} km</strong></span>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="neo-inset-box text-center py-4 text-neo-muted small">
+                No vehicles saved to your garage yet. <a href="{{ url_for('garage') }}" class="text-neo-accent fw-bold ms-1">Add your EV now</a>.
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Recent Predictions Table -->
+    <div class="neo-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold text-neo-primary mb-0">
+                <i class="bi bi-clock-history text-neo-emerald me-2"></i>Recent Range Predictions
+            </h5>
+            <a href="{{ url_for('history') }}" class="btn-neo btn-neo-pill small">
+                Full History ({{ total_predictions }}) <i class="bi bi-arrow-right ms-1"></i>
+            </a>
+        </div>
+
+        {% if recent_predictions %}
+            <div class="neo-table-wrapper">
+                <table class="neo-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>SoC</th>
+                            <th>Trip Speed</th>
+                            <th>Temp</th>
+                            <th>Predicted Range</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for rp in recent_predictions %}
+                            <tr>
+                                <td>{{ rp.created_at.strftime('%d %b %Y') }}</td>
+                                <td><strong>{{ rp.manufacturer }} {{ rp.model }}</strong></td>
+                                <td><span class="neo-badge neo-badge-inset text-neo-accent">{{ rp.battery_percentage }}%</span></td>
+                                <td>{{ rp.average_speed }} km/h</td>
+                                <td>{{ rp.ambient_temperature }}°C</td>
+                                <td><strong class="text-neo-emerald">{{ rp.predicted_range }} km</strong></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="neo-inset-box text-center py-4 text-neo-muted small">
+                No prediction history recorded yet. Open the cockpit to generate your first range estimation.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+{% endblock %}

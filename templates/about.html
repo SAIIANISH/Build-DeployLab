@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+
+{% block title %}Methodology & Academic Physics Architecture - EV Range Predictor{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header Section -->
+    <div class="text-center mb-5">
+        <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Technical Architecture</span>
+        <h2 class="display-6 fw-extrabold text-neo-primary">Why Real-World BEV Range Differs from Lab Ratings</h2>
+        <p class="text-neo-secondary max-w-700 mx-auto">
+            Laboratory dynamometer cycles (WLTP, ARAI, EPA) evaluate Battery Electric Vehicles under idealized static ambient conditions. In real road deployments, non-linear physical loads dictate energy dissipation.
+        </p>
+    </div>
+
+    <!-- Physics Load Principles Grid -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="neo-card h-100">
+                <div class="neo-brand-icon mb-3">
+                    <i class="bi bi-wind fs-4 text-neo-accent"></i>
+                </div>
+                <h5 class="fw-bold text-neo-primary">Aerodynamic Drag</h5>
+                <p class="text-neo-secondary small mb-2">
+                    Aerodynamic power scales cubically with velocity ($P_{\text{aero}} \propto v^3$). Cruising at 120 km/h demands over 2.3× more energy than 80 km/h.
+                </p>
+                <div class="neo-inset-box neo-inset-box-sm small text-neo-muted">
+                    $P_{\text{aero}} = \frac{0.5 \rho C_d A v^3}{1000}$
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="neo-card h-100">
+                <div class="neo-brand-icon mb-3" style="color: var(--neo-warning);">
+                    <i class="bi bi-thermometer-snow fs-4"></i>
+                </div>
+                <h5 class="fw-bold text-neo-primary">Thermal HVAC Aux</h5>
+                <p class="text-neo-secondary small mb-2">
+                    Sub-zero temperatures double electrolyte internal resistance. Cabin heating draws 2.5 to 4.5 kW directly from the traction pack without engine waste heat.
+                </p>
+                <div class="neo-inset-box neo-inset-box-sm small text-neo-muted">
+                    $P_{\text{hvac}} = 0.5 + 0.09 \cdot |\Delta T|$
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="neo-card h-100">
+                <div class="neo-brand-icon mb-3" style="color: var(--neo-emerald);">
+                    <i class="bi bi-triangle fs-4"></i>
+                </div>
+                <h5 class="fw-bold text-neo-primary">Terrain & Incline</h5>
+                <p class="text-neo-secondary small mb-2">
+                    Climbing gradients demands continuous potential energy. While regenerative braking recovers ~65-75% downhill, net climb drives substantial loss.
+                </p>
+                <div class="neo-inset-box neo-inset-box-sm small text-neo-muted">
+                    $P_{\text{grade}} = \frac{M g \sin(\theta) v}{1000}$
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-lg-3">
+            <div class="neo-card h-100">
+                <div class="neo-brand-icon mb-3" style="color: #8b5cf6;">
+                    <i class="bi bi-stoplights fs-4"></i>
+                </div>
+                <h5 class="fw-bold text-neo-primary">Traffic Kinetic Losses</h5>
+                <p class="text-neo-secondary small mb-2">
+                    Frequent stop-and-go acceleration cycles incur round-trip electrochemical conversion losses and continuous base auxiliary idle draw.
+                </p>
+                <div class="neo-inset-box neo-inset-box-sm small text-neo-muted">
+                    $\eta_{\text{regen}} \approx 68\% - 75\%$
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Machine Learning Pipeline Diagram -->
+    <div class="neo-card neo-card-lg mb-5">
+        <h4 class="fw-bold text-neo-primary mb-3 text-center">
+            <i class="bi bi-diagram-3-fill text-neo-accent me-2"></i> End-to-End Scikit-Learn Pipeline
+        </h4>
+        <div class="row g-3 text-center">
+            <div class="col-md-3">
+                <div class="neo-inset-box">
+                    <strong class="text-neo-primary d-block">1. Physics Simulation Dataset</strong>
+                    <span class="small text-neo-muted">2,800 drive cycles synthesized via validated automotive longitudinal dynamics equations</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="neo-inset-box">
+                    <strong class="text-neo-primary d-block">2. ColumnTransformer</strong>
+                    <span class="small text-neo-muted">StandardScaler for physics floats, OneHotEncoder for categories</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="neo-inset-box">
+                    <strong class="text-neo-primary d-block">3. HistGradientBoosting</strong>
+                    <span class="small text-neo-muted">Histogram-based binned gradient tree regressor (max_iter=100)</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="neo-inset-box">
+                    <strong class="text-neo-emerald d-block">4. Prediction Output</strong>
+                    <span class="small text-neo-muted">Remaining km, 90% uncertainty bound, normalized 100% equivalent</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6-Model Benchmark Table: Random Holdout Split -->
+    <div class="neo-card neo-card-lg mb-5">
+        <h4 class="fw-bold text-neo-primary mb-2">
+            <i class="bi bi-bar-chart-line-fill text-neo-accent me-2"></i> Standard Holdout Evaluation (80/20 Random Split)
+        </h4>
+        <p class="text-neo-secondary small mb-4">
+            Evaluated on held-out test data (<em>n</em> = 560 drive-cycle observations) across 26 vehicle variants. R&sup2; represents the coefficient of determination (explained variance ratio), not percentage accuracy.
+        </p>
+
+        <div class="neo-table-wrapper mb-3">
+            <table class="neo-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>MAE (km)</th>
+                        <th>RMSE (km)</th>
+                        <th>Validation R&sup2;</th>
+                        <th>MAPE (%)</th>
+                        <th>Outcome</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>HistGradientBoosting</strong></td>
+                        <td class="fw-bold text-neo-emerald">15.10 km</td>
+                        <td class="fw-bold text-neo-emerald">21.63 km</td>
+                        <td class="fw-bold text-neo-emerald">0.9664</td>
+                        <td class="fw-bold text-neo-emerald">11.57%</td>
+                        <td><span class="neo-badge neo-badge-inset text-neo-emerald">Selected Pipeline</span></td>
+                    </tr>
+                    <tr>
+                        <td>XGBoost</td>
+                        <td>19.45 km</td>
+                        <td>27.85 km</td>
+                        <td>0.9444</td>
+                        <td>15.63%</td>
+                        <td><span class="neo-badge neo-badge-inset text-neo-muted">Benchmarked</span></td>
+                    </tr>
+                    <tr>
+                        <td>Gradient Boosting</td>
+                        <td>23.81 km</td>
+                        <td>35.24 km</td>
+                        <td>0.9109</td>
+                        <td>21.53%</td>
+                        <td><span class="neo-badge neo-badge-inset text-neo-muted">Benchmarked</span></td>
+                    </tr>
+                    <tr>
+                        <td>Random Forest</td>
+                        <td>27.30 km</td>
+                        <td>37.63 km</td>
+                        <td>0.8984</td>
+                        <td>21.28%</td>
+                        <td><span class="neo-badge neo-badge-inset text-neo-muted">Benchmarked</span></td>
+                    </tr>
+                    <tr>
+                        <td>Decision Tree</td>
+                        <td>38.06 km</td>
+                        <td>56.16 km</td>
+                        <td>0.7738</td>
+                        <td>28.94%</td>
+                        <td><span class="neo-badge neo-badge-inset text-neo-muted">Benchmarked</span></td>
+                    </tr>
+                    <tr>
+                        <td>Linear Regression</td>
+                        <td>42.18 km</td>
+                        <td>58.11 km</td>
+                        <td>0.7578</td>
+                        <td>67.01%</td>
+                        <td><span class="neo-badge neo-badge-inset text-neo-muted">Benchmarked</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Group-Aware / Unseen Vehicle Generalization Benchmark Table -->
+    <div class="neo-card neo-card-lg">
+        <h4 class="fw-bold text-neo-primary mb-2">
+            <i class="bi bi-shield-lock-fill text-neo-accent me-2"></i> Group-Aware Leakage-Free Generalization (Unseen EV Variants)
+        </h4>
+        <p class="text-neo-secondary small mb-4">
+            Evaluated by reserving entire vehicle models strictly in the test set (GroupShuffleSplit &amp; 5-Fold GroupKFold CV). This tests the model's true physics transferability to unseen EVs without vehicle identity leakage.
+        </p>
+
+        <div class="neo-table-wrapper mb-3">
+            <table class="neo-table">
+                <thead>
+                    <tr>
+                        <th>Algorithm</th>
+                        <th>MAE (km)</th>
+                        <th>RMSE (km)</th>
+                        <th>Unseen Group R&sup2;</th>
+                        <th>5-Fold CV Mean R&sup2;</th>
+                        <th>MAPE (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>HistGradientBoosting</strong></td>
+                        <td class="fw-bold text-neo-emerald">20.31 km</td>
+                        <td class="fw-bold text-neo-emerald">31.78 km</td>
+                        <td class="fw-bold text-neo-emerald">0.9497</td>
+                        <td class="fw-bold text-neo-emerald">0.9559 &plusmn; 0.004</td>
+                        <td class="fw-bold text-neo-emerald">12.43%</td>
+                    </tr>
+                    <tr>
+                        <td>XGBoost</td>
+                        <td>22.94 km</td>
+                        <td>34.59 km</td>
+                        <td>0.9403</td>
+                        <td>&mdash;</td>
+                        <td>15.89%</td>
+                    </tr>
+                    <tr>
+                        <td>Gradient Boosting</td>
+                        <td>27.15 km</td>
+                        <td>44.73 km</td>
+                        <td>0.9002</td>
+                        <td>0.9003 &plusmn; 0.010</td>
+                        <td>19.20%</td>
+                    </tr>
+                    <tr>
+                        <td>Random Forest</td>
+                        <td>31.64 km</td>
+                        <td>45.58 km</td>
+                        <td>0.8965</td>
+                        <td>0.8982 &plusmn; 0.017</td>
+                        <td>22.38%</td>
+                    </tr>
+                    <tr>
+                        <td>Decision Tree</td>
+                        <td>40.05 km</td>
+                        <td>59.86 km</td>
+                        <td>0.8214</td>
+                        <td>&mdash;</td>
+                        <td>25.69%</td>
+                    </tr>
+                    <tr>
+                        <td>Linear Regression</td>
+                        <td>44.81 km</td>
+                        <td>69.22 km</td>
+                        <td>0.7612</td>
+                        <td>0.7635 &plusmn; 0.005</td>
+                        <td>48.47%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="small text-neo-muted">
+            <i class="bi bi-info-circle me-1"></i> <strong>Evaluation Methodology Note:</strong> R&sup2; (Coefficient of Determination) measures the proportion of variance explained by the model relative to the mean. It is not percentage classification accuracy. MAE measures average absolute error in km, and RMSE measures the square root of mean squared error.
+        </div>
+    </div>
+
+</div>
+{% endblock %}

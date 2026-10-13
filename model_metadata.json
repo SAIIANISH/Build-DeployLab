@@ -1,0 +1,254 @@
+{
+  "model_name": "HistGradientBoosting",
+  "version": "2.1.0",
+  "training_date": "2026-10-02 10:06:24",
+  "target_variable": "Remaining_Range_km",
+  "target_description": "Remaining driving range in km under current State of Charge and trip operating conditions",
+  "dataset_description": "Physics-grounded empirical simulation dataset based on verified OEM BEV specifications and standardized vehicle dynamics equations",
+  "numerical_features": [
+    "Battery_Capacity_kWh",
+    "Motor_Power_kW",
+    "Vehicle_Weight_kg",
+    "Battery_Percentage",
+    "Average_Speed_kmh",
+    "Ambient_Temperature_C",
+    "Passenger_Count",
+    "Battery_Age_Years"
+  ],
+  "categorical_features": [
+    "Drivetrain",
+    "Body_Type",
+    "Battery_Chemistry",
+    "Traffic_Condition",
+    "Terrain",
+    "Driving_Style",
+    "HVAC_Usage",
+    "Tyre_Pressure_Status"
+  ],
+  "feature_bounds": {
+    "Battery_Capacity_kWh": {
+      "min": 17.3,
+      "max": 82.5,
+      "mean": 54.88,
+      "std": 21.44
+    },
+    "Motor_Power_kW": {
+      "min": 31.0,
+      "max": 400.0,
+      "mean": 173.99,
+      "std": 103.37
+    },
+    "Vehicle_Weight_kg": {
+      "min": 890.0,
+      "max": 2665.0,
+      "mean": 1856.65,
+      "std": 367.3
+    },
+    "Battery_Percentage": {
+      "min": 10.0,
+      "max": 100.0,
+      "mean": 55.29,
+      "std": 25.81
+    },
+    "Average_Speed_kmh": {
+      "min": 15.1,
+      "max": 130.0,
+      "mean": 73.83,
+      "std": 33.2
+    },
+    "Ambient_Temperature_C": {
+      "min": -15.0,
+      "max": 45.0,
+      "mean": 15.53,
+      "std": 17.2
+    },
+    "Passenger_Count": {
+      "min": 1.0,
+      "max": 5.0,
+      "mean": 1.97,
+      "std": 1.18
+    },
+    "Battery_Age_Years": {
+      "min": 0.0,
+      "max": 8.0,
+      "mean": 2.21,
+      "std": 2.04
+    }
+  },
+  "categorical_options": {
+    "Drivetrain": [
+      "FWD",
+      "RWD",
+      "AWD"
+    ],
+    "Body_Type": [
+      "SUV",
+      "Sedan",
+      "Crossover",
+      "Hatchback"
+    ],
+    "Battery_Chemistry": [
+      "LFP",
+      "NMC"
+    ],
+    "Traffic_Condition": [
+      "Low/Highway",
+      "Heavy/Stop-and-Go",
+      "Moderate/City"
+    ],
+    "Terrain": [
+      "Flat",
+      "Hilly",
+      "Mountainous"
+    ],
+    "Driving_Style": [
+      "Aggressive",
+      "Normal",
+      "Eco/Gentle"
+    ],
+    "HVAC_Usage": [
+      "High",
+      "Moderate",
+      "Off"
+    ],
+    "Tyre_Pressure_Status": [
+      "Very Low -20%",
+      "Normal",
+      "Low -10%"
+    ]
+  },
+  "random_split_metrics": {
+    "Linear Regression": {
+      "MAE": 42.18,
+      "MSE": 3376.25,
+      "RMSE": 58.11,
+      "R2": 0.7578,
+      "MAPE": 67.01
+    },
+    "Decision Tree": {
+      "MAE": 38.06,
+      "MSE": 3154.43,
+      "RMSE": 56.16,
+      "R2": 0.7738,
+      "MAPE": 28.94
+    },
+    "Random Forest": {
+      "MAE": 27.3,
+      "MSE": 1416.04,
+      "RMSE": 37.63,
+      "R2": 0.8984,
+      "MAPE": 21.28
+    },
+    "Gradient Boosting": {
+      "MAE": 23.81,
+      "MSE": 1241.63,
+      "RMSE": 35.24,
+      "R2": 0.9109,
+      "MAPE": 21.53
+    },
+    "HistGradientBoosting": {
+      "MAE": 15.1,
+      "MSE": 467.95,
+      "RMSE": 21.63,
+      "R2": 0.9664,
+      "MAPE": 11.57
+    },
+    "XGBoost": {
+      "MAE": 19.45,
+      "MSE": 775.67,
+      "RMSE": 27.85,
+      "R2": 0.9444,
+      "MAPE": 15.63
+    }
+  },
+  "group_split_metrics": {
+    "Linear Regression": {
+      "MAE": 44.81,
+      "MSE": 4790.72,
+      "RMSE": 69.22,
+      "R2": 0.7612,
+      "MAPE": 48.47
+    },
+    "Decision Tree": {
+      "MAE": 40.05,
+      "MSE": 3582.98,
+      "RMSE": 59.86,
+      "R2": 0.8214,
+      "MAPE": 25.69
+    },
+    "Random Forest": {
+      "MAE": 31.64,
+      "MSE": 2077.16,
+      "RMSE": 45.58,
+      "R2": 0.8965,
+      "MAPE": 22.38
+    },
+    "Gradient Boosting": {
+      "MAE": 27.15,
+      "MSE": 2001.13,
+      "RMSE": 44.73,
+      "R2": 0.9002,
+      "MAPE": 19.2
+    },
+    "HistGradientBoosting": {
+      "MAE": 20.31,
+      "MSE": 1009.85,
+      "RMSE": 31.78,
+      "R2": 0.9497,
+      "MAPE": 12.43
+    },
+    "XGBoost": {
+      "MAE": 22.94,
+      "MSE": 1196.73,
+      "RMSE": 34.59,
+      "R2": 0.9403,
+      "MAPE": 15.89
+    }
+  },
+  "group_kfold_cv_metrics": {
+    "HistGradientBoosting": {
+      "mean_r2": 0.9559,
+      "std_r2": 0.0041,
+      "mean_rmse": 26.53,
+      "mean_mae": 17.58,
+      "mean_mape": 12.95
+    },
+    "Gradient Boosting": {
+      "mean_r2": 0.9003,
+      "std_r2": 0.0101,
+      "mean_rmse": 39.92,
+      "mean_mae": 26.6,
+      "mean_mape": 22.7
+    },
+    "Random Forest": {
+      "mean_r2": 0.8982,
+      "std_r2": 0.0165,
+      "mean_rmse": 40.17,
+      "mean_mae": 27.95,
+      "mean_mape": 21.65
+    },
+    "Linear Regression": {
+      "mean_r2": 0.7635,
+      "std_r2": 0.0053,
+      "mean_rmse": 61.57,
+      "mean_mae": 43.96,
+      "mean_mape": 58.93
+    }
+  },
+  "winning_metrics": {
+    "model_name": "HistGradientBoosting",
+    "r2_score": 0.9664,
+    "random_split_r2": 0.9664,
+    "random_split_rmse_km": 21.63,
+    "random_split_mae_km": 15.1,
+    "random_split_mape_pct": 11.57,
+    "group_split_r2": 0.9497,
+    "group_split_rmse_km": 31.78,
+    "group_cv_r2_mean": 0.9559,
+    "residual_std_error_km": 21.63
+  },
+  "total_samples": 2800,
+  "train_samples_random": 2240,
+  "test_samples_random": 560,
+  "dataset_file": "real_ev_dataset.csv"
+}

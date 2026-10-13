@@ -1,0 +1,239 @@
+{% extends 'base.html' %}
+
+{% block title %}Prediction Result - {{ result.manufacturer }} {{ result.model }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+
+            <!-- Out-of-Distribution Safety Warning if Triggered -->
+            {% if result.ood_warning %}
+                <div class="neo-alert neo-alert-warning mb-4" role="alert">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 text-neo-warning"></i>
+                        <div>
+                            <strong class="d-block text-neo-primary">Operating Boundary Notice:</strong>
+                            <span class="small text-neo-secondary">{{ result.ood_warning }}</span>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Centerpiece: Neumorphic Range Prediction Card -->
+            <div class="neo-result-hero mb-4">
+                <div class="d-flex justify-content-center gap-2 mb-3">
+                    <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1">
+                        {{ result.manufacturer }} &bull; {{ result.model }}
+                    </span>
+                    <span class="neo-badge neo-badge-inset text-neo-muted">
+                        {{ result.variant_name }}
+                    </span>
+                </div>
+
+                <div class="small text-neo-muted mb-4">
+                    {{ result.body_type }} &bull; {{ result.drivetrain }} &bull; {{ result.battery_capacity }} kWh ({{ result.battery_chemistry }})
+                </div>
+
+                <!-- Circular Range Gauge -->
+                <div class="neo-gauge-container">
+                    <div class="neo-gauge-dial">
+                        <div class="neo-gauge-dial-inner">
+                            <span class="neo-gauge-value">{{ result.predicted_range }}</span>
+                            <span class="neo-gauge-unit">Kilometers</span>
+                        </div>
+                    </div>
+                </div>
+
+                <p class="text-neo-secondary fw-semibold mb-2">
+                    ML Estimated Remaining Driving Range at <span class="text-neo-accent fw-bold">{{ result.battery_percentage }}% SoC</span> under current trip conditions.
+                </p>
+
+                <!-- Uncertainty & Confidence Indicator -->
+                <div class="d-flex flex-wrap justify-content-center align-items-center gap-2 mb-3">
+                    <span class="neo-badge neo-badge-inset text-neo-primary">
+                        <i class="bi bi-arrows-expand me-1"></i> 90% Expected Interval: <strong>{{ result.range_min }} &ndash; {{ result.range_max }} km</strong>
+                    </span>
+                    <span class="neo-badge neo-badge-inset {% if 'Reduced' in result.confidence_level %}text-neo-warning{% else %}text-neo-emerald{% endif %}">
+                        <i class="bi bi-shield-check me-1"></i> Confidence: {{ result.confidence_level }}
+                    </span>
+                </div>
+
+                <!-- Core Comparison Inset Cards -->
+                <div class="row g-3 mt-1">
+                    <div class="col-md-3 col-6">
+                        <div class="neo-inset-box text-center h-100">
+                            <span class="small text-neo-muted d-block mb-1">ML Estimated Range</span>
+                            <span class="fs-4 fw-extrabold text-neo-primary">{{ result.predicted_range }} <small class="fs-6 text-neo-muted">km</small></span>
+                            <span class="neo-badge neo-badge-inset text-neo-accent d-block mt-2">At {{ result.battery_percentage }}% SoC</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-6">
+                        <div class="neo-inset-box text-center h-100">
+                            <span class="small text-neo-muted d-block mb-1">Normalized 100% Equiv.</span>
+                            <span class="fs-4 fw-extrabold text-neo-primary">{{ result.normalized_full_range }} <small class="fs-6 text-neo-muted">km</small></span>
+                            <span class="neo-badge neo-badge-inset text-neo-muted d-block mt-2">Predicted / (SoC/100)</span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-6">
+                        <div class="neo-inset-box text-center h-100">
+                            <span class="small text-neo-muted d-block mb-1">Certified Lab Cycle</span>
+                            <span class="fs-4 fw-extrabold text-neo-primary">{{ result.official_range }} <small class="fs-6 text-neo-muted">km</small></span>
+                            <span class="neo-badge neo-badge-inset text-neo-muted d-block mt-2">
+                                {{ result.test_cycle }} Standard
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3 col-6">
+                        <div class="neo-inset-box text-center h-100">
+                            <span class="small text-neo-muted d-block mb-1">Real-World Benchmark</span>
+                            <span class="fs-5 fw-extrabold text-neo-primary mt-1 d-block">{{ result.real_world_reference_km }}</span>
+                            <span class="neo-badge neo-badge-inset text-neo-emerald d-block mt-2" title="{{ result.reference_source }}">
+                                Verified OEM / Road Test
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                {% if result.reference_source %}
+                    <div class="text-center small text-neo-muted mt-2">
+                        <i class="bi bi-info-circle me-1"></i> Reference Benchmark Source: <em>{{ result.reference_source }}</em>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Derived Energy & Consumption Telemetry -->
+            <div class="neo-card mb-4">
+                <h5 class="fw-bold text-neo-primary mb-3">
+                    <i class="bi bi-speedometer2 text-neo-accent me-2"></i> Verified Physics & Available Energy
+                </h5>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <div class="neo-inset-box h-100">
+                            <span class="small text-neo-muted d-block mb-1">Estimated Available Energy in Pack</span>
+                            <span class="fs-4 fw-bold text-neo-primary">{{ result.usable_energy }} <small class="text-neo-muted">kWh</small></span>
+                            <div class="small text-neo-secondary mt-1">
+                                Effective capacity: <strong>{{ result.effective_capacity }} kWh</strong> (at <strong>{{ result.battery_age }} yr(s)</strong> user-entered battery age).
+                            </div>
+                            <div class="small text-neo-muted mt-1 fst-italic">
+                                Note: Calculated via empirical ~1.8%/yr calendar degradation model. Physical State of Health (SOH) requires hardware BMS diagnostics.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="neo-inset-box h-100">
+                            <span class="small text-neo-muted d-block mb-1">Estimated Specific Consumption</span>
+                            <span class="fs-4 fw-bold text-neo-primary">{{ result.efficiency_wh_km }} <small class="text-neo-muted">Wh/km</small></span>
+                            <div class="small text-neo-secondary mt-1">
+                                Total dynamic vehicle mass: <strong>{{ result.total_weight }} kg</strong> (Curb + {{ result.passenger_count }} passenger(s) @ 75kg).
+                            </div>
+                            <div class="small text-neo-muted mt-1 fst-italic">
+                                Derived from available energy divided by ML estimated distance: ({{ result.usable_energy }} kWh &times; 1000) / {{ result.predicted_range }} km.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trip Planning Safety Advisory -->
+            <div class="neo-card mb-4">
+                <div class="d-flex align-items-start gap-3">
+                    <i class="bi bi-shield-exclamation text-neo-accent fs-3 flex-shrink-0"></i>
+                    <div>
+                        <strong class="text-neo-primary d-block mb-1">Real-World Trip Planning Advisory</strong>
+                        <p class="small text-neo-secondary mb-0">
+                            Range is a data-driven model estimate, not a guaranteed trip boundary. Actual on-road consumption varies dynamically with real-time headwinds, traffic congestion, cabin heating/air conditioning, topography, payload, and driving aggressiveness. For safe long-distance route planning, always plan charging stops with a <strong>15% to 20% battery reserve buffer</strong>.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submitted Trip Parameters Breakdown -->
+            <div class="neo-card mb-4">
+                <h5 class="fw-bold text-neo-primary mb-3">
+                    <i class="bi bi-card-checklist text-neo-accent me-2"></i> Operational Parameters Summary
+                </h5>
+                <div class="neo-table-wrapper">
+                    <table class="neo-table">
+                        <tbody>
+                            <tr>
+                                <td class="text-neo-muted w-25">Vehicle Identity</td>
+                                <td class="fw-bold text-neo-primary w-25">{{ result.manufacturer }} {{ result.model }}</td>
+                                <td class="text-neo-muted w-25">Battery SoC</td>
+                                <td class="fw-bold text-neo-accent w-25">{{ result.battery_percentage }}%</td>
+                            </tr>
+                            <tr>
+                                <td class="text-neo-muted">Average Trip Speed</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.average_speed }} km/h</td>
+                                <td class="text-neo-muted">Ambient Outside Temp</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.ambient_temperature }} &deg;C</td>
+                            </tr>
+                            <tr>
+                                <td class="text-neo-muted">Traffic Flow Condition</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.traffic_condition }}</td>
+                                <td class="text-neo-muted">Route Terrain Profile</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.terrain }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-neo-muted">Driving Style Profile</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.driving_style }}</td>
+                                <td class="text-neo-muted">Cabin HVAC Aux Draw</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.hvac_usage }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-neo-muted">Passenger Occupants</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.passenger_count }} Person(s)</td>
+                                <td class="text-neo-muted">Battery Calendar Age</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.battery_age }} yr(s) (Entered)</td>
+                            </tr>
+                            <tr>
+                                <td class="text-neo-muted">Tyre Pressure Status</td>
+                                <td class="fw-semibold text-neo-primary">{{ result.tyre_pressure_status }}</td>
+                                <td class="text-neo-muted">Validation Metrics</td>
+                                <td class="fw-semibold text-neo-accent">R&sup2; = {{ result.model_r2 }} (Group CV = {{ result.model_cv_r2 }})</td>
+                            </tr>
+                            <tr>
+                                <td class="text-neo-muted">ML Regressor Engine</td>
+                                <td colspan="3" class="fw-semibold text-neo-accent">
+                                    {{ result.model_name }} (MAE: {{ result.model_mae }}, RMSE: {{ result.model_rmse }}, Auto-Saved to Personal History)
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Action Controls -->
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('dashboard') }}" class="btn-neo btn-neo-primary">
+                        <i class="bi bi-arrow-repeat"></i> Adjust & Predict Again
+                    </a>
+                    {% if not result.is_in_garage %}
+                        <form method="POST" action="{{ url_for('garage_add') }}" class="d-inline">
+                            <input type="hidden" name="variant_id" value="{{ result.variant_id }}">
+                            <button type="submit" class="btn-neo btn-neo-emerald">
+                                <i class="bi bi-bookmark-plus"></i> Save EV to My Garage
+                            </button>
+                        </form>
+                    {% endif %}
+                </div>
+
+                <div class="d-flex flex-wrap gap-2">
+                    <a href="{{ url_for('history') }}" class="btn-neo">
+                        <i class="bi bi-clock-history"></i> View in My History
+                    </a>
+                    <button type="button" class="btn-neo" onclick="window.print()">
+                        <i class="bi bi-printer"></i> Print Report
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+{% endblock %}
