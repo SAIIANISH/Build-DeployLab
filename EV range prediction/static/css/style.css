@@ -1,0 +1,866 @@
+/* ==========================================================================
+   AUTHENTIC NEUMORPHIC / SOFT UI DESIGN SYSTEM
+   Electric Vehicle Intelligent Cockpit & Machine Learning Analytics Platform
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------
+   1. DESIGN TOKENS & CSS VARIABLES
+   ------------------------------------------------------------------------- */
+:root {
+    /* Primary Soft Clay Foundation */
+    --neo-bg: #e0e5ec;
+    --neo-surface: #e0e5ec;
+    --neo-surface-convex: linear-gradient(145deg, #eff5fd, #cad0d8);
+    --neo-surface-concave: linear-gradient(145deg, #cad0d8, #eff5fd);
+
+    /* Dual Soft Shadows (Authentic Neumorphism Lighting: Top-Left to Bottom-Right) */
+    --neo-shadow-dark: rgba(163, 177, 198, 0.65);
+    --neo-shadow-light: rgba(255, 255, 255, 0.95);
+    --neo-shadow-dark-intense: rgba(145, 160, 180, 0.85);
+
+    /* Elevation Profiles */
+    --neo-raised-sm: 4px 4px 9px var(--neo-shadow-dark), -4px -4px 9px var(--neo-shadow-light);
+    --neo-raised: 8px 8px 18px var(--neo-shadow-dark), -8px -8px 18px var(--neo-shadow-light);
+    --neo-raised-lg: 14px 14px 28px var(--neo-shadow-dark), -14px -14px 28px var(--neo-shadow-light);
+    --neo-raised-hover: 10px 10px 22px var(--neo-shadow-dark), -10px -10px 22px var(--neo-shadow-light);
+
+    /* Inset (Sunken) Cavity Profiles */
+    --neo-inset-sm: inset 3px 3px 6px var(--neo-shadow-dark), inset -3px -3px 6px var(--neo-shadow-light);
+    --neo-inset: inset 5px 5px 10px var(--neo-shadow-dark), inset -5px -5px 10px var(--neo-shadow-light);
+    --neo-inset-deep: inset 7px 7px 14px var(--neo-shadow-dark), inset -7px -7px 14px var(--neo-shadow-light);
+
+    /* Typography & Contrast (Exceeds WCAG AA 4.5:1 Standards) */
+    --neo-font: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --neo-text: #1e293b;            /* High-contrast deep slate */
+    --neo-text-secondary: #475569;  /* Balanced body text */
+    --neo-text-muted: #64748b;      /* Accessible helper text */
+    --neo-text-light: #94a3b8;
+
+    /* EV Automotive Accent Palette */
+    --neo-accent: #0284c7;          /* Electric Cyan / Sky */
+    --neo-accent-hover: #0369a1;
+    --neo-accent-glow: rgba(2, 132, 199, 0.25);
+    --neo-emerald: #059669;         /* Eco Green */
+    --neo-emerald-glow: rgba(5, 150, 105, 0.25);
+    --neo-danger: #dc2626;
+    --neo-warning: #d97706;
+
+    /* Border Radii */
+    --neo-radius-sm: 10px;
+    --neo-radius-md: 18px;
+    --neo-radius-lg: 26px;
+    --neo-radius-pill: 9999px;
+}
+
+/* -------------------------------------------------------------------------
+   2. GLOBAL RESET & BASE STYLING
+   ------------------------------------------------------------------------- */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--neo-bg);
+    color: var(--neo-text);
+    font-family: var(--neo-font);
+    line-height: 1.6;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Typography Hierarchy */
+h1, h2, h3, h4, h5, h6 {
+    color: var(--neo-text);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-top: 0;
+}
+
+p, span, label, small {
+    color: inherit;
+}
+
+a {
+    color: var(--neo-accent);
+    text-decoration: none;
+    transition: all 0.2s ease-out;
+}
+
+a:hover {
+    color: var(--neo-accent-hover);
+}
+
+/* Utility Helpers */
+.text-neo-primary { color: var(--neo-text) !important; }
+.text-neo-secondary { color: var(--neo-text-secondary) !important; }
+.text-neo-muted { color: var(--neo-text-muted) !important; }
+.text-neo-accent { color: var(--neo-accent) !important; }
+.text-neo-emerald { color: var(--neo-emerald) !important; }
+.text-neo-danger { color: var(--neo-danger) !important; }
+.text-neo-warning { color: var(--neo-warning) !important; }
+
+/* -------------------------------------------------------------------------
+   3. NEUMORPHIC CONTAINERS & CARDS
+   ------------------------------------------------------------------------- */
+.neo-card {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-md);
+    box-shadow: var(--neo-raised);
+    border: none !important;
+    padding: 1.75rem;
+    position: relative;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.neo-card-lg {
+    border-radius: var(--neo-radius-lg);
+    box-shadow: var(--neo-raised-lg);
+    padding: 2.25rem;
+}
+
+.neo-card-hover:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--neo-raised-hover);
+}
+
+/* Sunken / Inset Well */
+.neo-inset-box {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-sm);
+    box-shadow: var(--neo-inset);
+    padding: 1.25rem;
+}
+
+.neo-inset-box-sm {
+    border-radius: var(--neo-radius-sm);
+    box-shadow: var(--neo-inset-sm);
+    padding: 0.75rem 1rem;
+}
+
+/* -------------------------------------------------------------------------
+   4. NEUMORPHIC NAVIGATION
+   ------------------------------------------------------------------------- */
+.neo-navbar {
+    background-color: var(--neo-bg);
+    box-shadow: var(--neo-raised);
+    border-radius: var(--neo-radius-lg);
+    padding: 0.85rem 1.75rem;
+    margin: 1.25rem auto 2rem auto;
+    transition: all 0.3s ease;
+}
+
+.neo-brand {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--neo-text) !important;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    letter-spacing: -0.03em;
+}
+
+.neo-brand-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: var(--neo-radius-pill);
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised-sm);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--neo-accent);
+}
+
+.neo-nav-link {
+    color: var(--neo-text-secondary) !important;
+    font-weight: 600;
+    font-size: 0.92rem;
+    padding: 0.55rem 1.1rem !important;
+    border-radius: var(--neo-radius-pill);
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.neo-nav-link:hover {
+    color: var(--neo-accent) !important;
+    box-shadow: var(--neo-raised-sm);
+}
+
+/* Active Nav Pill (Pressed State into Surface) */
+.neo-nav-link.active {
+    color: var(--neo-accent) !important;
+    box-shadow: var(--neo-inset-sm) !important;
+    background-color: var(--neo-surface);
+    font-weight: 700;
+}
+
+/* -------------------------------------------------------------------------
+   5. NEUMORPHIC BUTTONS
+   ------------------------------------------------------------------------- */
+.btn-neo {
+    background-color: var(--neo-surface);
+    color: var(--neo-text);
+    font-family: var(--neo-font);
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0.7rem 1.4rem;
+    border-radius: var(--neo-radius-md);
+    box-shadow: var(--neo-raised);
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none !important;
+    outline: none;
+}
+
+.btn-neo:hover {
+    color: var(--neo-text);
+    box-shadow: var(--neo-raised-hover);
+    transform: translateY(-1px);
+}
+
+/* Physical Pressed Inset State */
+.btn-neo:active,
+.btn-neo.active {
+    box-shadow: var(--neo-inset) !important;
+    transform: translateY(1px);
+}
+
+.btn-neo:focus-visible {
+    box-shadow: var(--neo-raised), 0 0 0 3px var(--neo-accent-glow);
+}
+
+/* Primary Electric Accent Button */
+.btn-neo-primary {
+    background: var(--neo-surface-convex);
+    color: var(--neo-accent);
+    box-shadow: var(--neo-raised);
+    font-weight: 700;
+}
+
+.btn-neo-primary:hover {
+    color: var(--neo-accent-hover);
+    box-shadow: var(--neo-raised-hover);
+}
+
+.btn-neo-primary:active,
+.btn-neo-primary.active {
+    background: var(--neo-surface-concave);
+    box-shadow: var(--neo-inset) !important;
+    color: var(--neo-accent-hover);
+}
+
+/* Hero Gradient Action Button */
+.btn-neo-gradient {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff !important;
+    box-shadow: 6px 6px 16px rgba(2, 132, 199, 0.4), -6px -6px 16px rgba(255, 255, 255, 0.85);
+    font-weight: 700;
+}
+
+.btn-neo-gradient:hover {
+    box-shadow: 8px 8px 20px rgba(2, 132, 199, 0.5), -8px -8px 20px rgba(255, 255, 255, 0.95);
+    transform: translateY(-1px);
+}
+
+.btn-neo-gradient:active {
+    box-shadow: inset 4px 4px 8px rgba(1, 74, 114, 0.7), inset -4px -4px 8px rgba(14, 165, 233, 0.5) !important;
+    transform: translateY(1px);
+}
+
+/* Eco Emerald Button */
+.btn-neo-emerald {
+    background-color: var(--neo-surface);
+    color: var(--neo-emerald);
+    box-shadow: var(--neo-raised);
+    font-weight: 700;
+}
+
+.btn-neo-emerald:hover {
+    color: #047857;
+    box-shadow: var(--neo-raised-hover);
+}
+
+.btn-neo-emerald:active {
+    box-shadow: var(--neo-inset) !important;
+}
+
+/* Danger Button */
+.btn-neo-danger {
+    background-color: var(--neo-surface);
+    color: var(--neo-danger);
+    box-shadow: var(--neo-raised);
+}
+
+.btn-neo-danger:hover {
+    color: #b91c1c;
+    box-shadow: var(--neo-raised-hover);
+}
+
+.btn-neo-danger:active {
+    box-shadow: var(--neo-inset) !important;
+}
+
+/* Small Pill Buttons */
+.btn-neo-pill {
+    border-radius: var(--neo-radius-pill);
+    padding: 0.45rem 1rem;
+    font-size: 0.85rem;
+    box-shadow: var(--neo-raised-sm);
+}
+
+.btn-neo-pill:hover {
+    box-shadow: var(--neo-raised);
+}
+
+.btn-neo-pill:active {
+    box-shadow: var(--neo-inset-sm) !important;
+}
+
+/* -------------------------------------------------------------------------
+   6. NEUMORPHIC FORM CONTROLS (Sunken Inset Inputs)
+   ------------------------------------------------------------------------- */
+.neo-input-group {
+    margin-bottom: 1.5rem;
+}
+
+.neo-label {
+    display: block;
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: var(--neo-text);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.01em;
+}
+
+.neo-input,
+.neo-select,
+.form-control.neo-input,
+.form-select.neo-select {
+    width: 100%;
+    background-color: var(--neo-surface) !important;
+    border: none !important;
+    border-radius: var(--neo-radius-sm);
+    box-shadow: var(--neo-inset) !important;
+    color: var(--neo-text) !important;
+    font-family: var(--neo-font);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.75rem 1.15rem;
+    outline: none !important;
+    transition: all 0.2s ease;
+}
+
+.neo-input::placeholder {
+    color: var(--neo-text-muted);
+    font-weight: 400;
+}
+
+.neo-input:focus,
+.neo-select:focus,
+.form-control.neo-input:focus,
+.form-select.neo-select:focus {
+    box-shadow: var(--neo-inset-deep), 0 0 0 2px var(--neo-accent) !important;
+}
+
+.neo-input:disabled,
+.neo-select:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* -------------------------------------------------------------------------
+   7. NEUMORPHIC TACTILE CONTROLS (Sliders, Segmented Buttons, Steppers)
+   ------------------------------------------------------------------------- */
+
+/* Custom Neumorphic Range Slider */
+.neo-slider-wrapper {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-md);
+    box-shadow: var(--neo-inset);
+    padding: 1.1rem 1.25rem 0.85rem 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.neo-slider-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.65rem;
+}
+
+.neo-slider-value {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--neo-accent);
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised-sm);
+    border-radius: var(--neo-radius-pill);
+    padding: 0.2rem 0.8rem;
+    min-width: 65px;
+    text-align: center;
+}
+
+.neo-range-slider {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: var(--neo-radius-pill);
+    background: #cad2df;
+    box-shadow: inset 2px 2px 4px var(--neo-shadow-dark), inset -2px -2px 4px var(--neo-shadow-light);
+    outline: none;
+    margin: 10px 0;
+}
+
+/* WebKit Thumb */
+.neo-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--neo-surface);
+    box-shadow: 4px 4px 8px var(--neo-shadow-dark), -4px -4px 8px var(--neo-shadow-light), 0 0 0 3px var(--neo-accent);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.neo-range-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+    box-shadow: 5px 5px 10px var(--neo-shadow-dark), -5px -5px 10px var(--neo-shadow-light), 0 0 0 4px var(--neo-accent);
+}
+
+.neo-range-slider::-webkit-slider-thumb:active {
+    box-shadow: inset 2px 2px 5px var(--neo-shadow-dark), inset -2px -2px 5px var(--neo-shadow-light), 0 0 0 3px var(--neo-accent);
+}
+
+/* Firefox Thumb */
+.neo-range-slider::-moz-range-thumb {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background-color: var(--neo-surface);
+    border: none;
+    box-shadow: 4px 4px 8px var(--neo-shadow-dark), -4px -4px 8px var(--neo-shadow-light), 0 0 0 3px var(--neo-accent);
+    cursor: pointer;
+}
+
+/* Segmented Buttons Container (Pill Switcher) */
+.neo-segmented-group {
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-inset-sm);
+    border-radius: var(--neo-radius-md);
+    padding: 0.4rem;
+    display: flex;
+    gap: 0.35rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.5rem;
+}
+
+.neo-segment-btn {
+    flex: 1 1 auto;
+    background-color: var(--neo-surface);
+    color: var(--neo-text-secondary);
+    border: none;
+    border-radius: var(--neo-radius-sm);
+    padding: 0.55rem 0.85rem;
+    font-size: 0.86rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: center;
+    box-shadow: var(--neo-raised-sm);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+}
+
+.neo-segment-btn:hover {
+    color: var(--neo-text);
+    box-shadow: var(--neo-raised);
+}
+
+/* Active Segment (Pressed into Surface) */
+.neo-segment-btn.active {
+    background-color: var(--neo-surface);
+    color: var(--neo-accent);
+    box-shadow: var(--neo-inset) !important;
+    font-weight: 700;
+}
+
+/* Tactile Stepper Control */
+.neo-stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.neo-stepper-btn {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised-sm);
+    border: none;
+    color: var(--neo-text);
+    font-size: 1.25rem;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.neo-stepper-btn:hover {
+    box-shadow: var(--neo-raised);
+    color: var(--neo-accent);
+}
+
+.neo-stepper-btn:active {
+    box-shadow: var(--neo-inset-sm) !important;
+}
+
+.neo-stepper-display {
+    flex: 1;
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-inset-sm);
+    border-radius: var(--neo-radius-sm);
+    padding: 0.65rem 1rem;
+    text-align: center;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--neo-text);
+}
+
+/* -------------------------------------------------------------------------
+   8. RESULT CENTERPIECE & CIRCULAR RANGE GAUGE
+   ------------------------------------------------------------------------- */
+.neo-result-hero {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-lg);
+    box-shadow: var(--neo-raised-lg);
+    padding: 2.75rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.neo-gauge-container {
+    position: relative;
+    width: 240px;
+    height: 240px;
+    margin: 0 auto 1.5rem auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.neo-gauge-dial {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-inset);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+}
+
+.neo-gauge-dial-inner {
+    width: 155px;
+    height: 155px;
+    border-radius: 50%;
+    background: var(--neo-surface-convex);
+    box-shadow: var(--neo-raised);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.neo-gauge-value {
+    font-size: 2.8rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--neo-accent);
+    letter-spacing: -0.04em;
+}
+
+.neo-gauge-unit {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--neo-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-top: 0.25rem;
+}
+
+/* -------------------------------------------------------------------------
+   9. NEUMORPHIC TABLES & STATS
+   ------------------------------------------------------------------------- */
+.neo-table-wrapper {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-md);
+    box-shadow: var(--neo-inset-sm);
+    padding: 0.5rem;
+    overflow-x: auto;
+}
+
+.neo-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 0.5rem;
+    margin: 0;
+}
+
+.neo-table th {
+    background-color: transparent;
+    color: var(--neo-text-muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.75rem 1rem;
+    border: none;
+}
+
+.neo-table td {
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised-sm);
+    color: var(--neo-text);
+    font-size: 0.92rem;
+    font-weight: 600;
+    padding: 0.9rem 1.1rem;
+    border: none;
+    vertical-align: middle;
+    transition: all 0.2s ease;
+}
+
+.neo-table tr td:first-child {
+    border-top-left-radius: var(--neo-radius-sm);
+    border-bottom-left-radius: var(--neo-radius-sm);
+}
+
+.neo-table tr td:last-child {
+    border-top-right-radius: var(--neo-radius-sm);
+    border-bottom-right-radius: var(--neo-radius-sm);
+}
+
+.neo-table tbody tr:hover td {
+    box-shadow: var(--neo-raised);
+    transform: translateY(-1px);
+}
+
+/* -------------------------------------------------------------------------
+   10. ALERTS & FLASH MESSAGES
+   ------------------------------------------------------------------------- */
+.neo-alert {
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised);
+    border-radius: var(--neo-radius-md);
+    padding: 1.1rem 1.4rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    border: none !important;
+}
+
+.neo-alert-success {
+    border-left: 6px solid var(--neo-emerald) !important;
+    color: #065f46;
+}
+
+.neo-alert-danger {
+    border-left: 6px solid var(--neo-danger) !important;
+    color: #991b1b;
+}
+
+.neo-alert-warning {
+    border-left: 6px solid var(--neo-warning) !important;
+    color: #92400e;
+}
+
+.neo-alert-info {
+    border-left: 6px solid var(--neo-accent) !important;
+    color: #075985;
+}
+
+/* -------------------------------------------------------------------------
+   11. BADGES & PILLS
+   ------------------------------------------------------------------------- */
+.neo-badge {
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised-sm);
+    color: var(--neo-text);
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--neo-radius-pill);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    letter-spacing: 0.02em;
+}
+
+.neo-badge-inset {
+    box-shadow: var(--neo-inset-sm) !important;
+}
+
+.neo-badge-accent {
+    color: var(--neo-accent);
+}
+
+.neo-badge-emerald {
+    color: var(--neo-emerald);
+}
+
+/* -------------------------------------------------------------------------
+   12. USER PROFILE & GARAGE VEHICLE CARDS
+   ------------------------------------------------------------------------- */
+.neo-garage-card {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-md);
+    box-shadow: var(--neo-raised);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    transition: all 0.25s ease;
+    position: relative;
+}
+
+.neo-garage-card:hover {
+    box-shadow: var(--neo-raised-hover);
+    transform: translateY(-2px);
+}
+
+.neo-garage-card.is-default {
+    border: 2px solid var(--neo-accent) !important;
+}
+
+.neo-stat-card {
+    background-color: var(--neo-surface);
+    border-radius: var(--neo-radius-md);
+    box-shadow: var(--neo-raised);
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.neo-stat-num {
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--neo-text);
+    line-height: 1.1;
+    margin-bottom: 0.3rem;
+}
+
+.neo-stat-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--neo-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* -------------------------------------------------------------------------
+   13. FOOTER
+   ------------------------------------------------------------------------- */
+.neo-footer {
+    background-color: var(--neo-surface);
+    box-shadow: var(--neo-raised);
+    border-radius: var(--neo-radius-lg);
+    padding: 1.75rem 2rem;
+    margin: 3.5rem auto 1.5rem auto;
+    text-align: center;
+    color: var(--neo-text-muted);
+    font-size: 0.88rem;
+}
+
+/* -------------------------------------------------------------------------
+   14. RESPONSIVE DESIGN & ACCESSIBILITY
+   ------------------------------------------------------------------------- */
+@media (max-width: 991px) {
+    .neo-navbar {
+        border-radius: var(--neo-radius-md);
+        margin: 0.75rem auto 1.5rem auto;
+        padding: 0.85rem 1.25rem;
+    }
+}
+
+@media (max-width: 768px) {
+    :root {
+        --neo-raised: 5px 5px 12px var(--neo-shadow-dark), -5px -5px 12px var(--neo-shadow-light);
+        --neo-raised-lg: 8px 8px 18px var(--neo-shadow-dark), -8px -8px 18px var(--neo-shadow-light);
+        --neo-inset: inset 4px 4px 8px var(--neo-shadow-dark), inset -4px -4px 8px var(--neo-shadow-light);
+    }
+
+    .neo-card {
+        padding: 1.25rem;
+    }
+
+    .neo-card-lg {
+        padding: 1.5rem;
+    }
+
+    .neo-gauge-container {
+        width: 200px;
+        height: 200px;
+    }
+
+    .neo-gauge-dial {
+        width: 170px;
+        height: 170px;
+    }
+
+    .neo-gauge-dial-inner {
+        width: 130px;
+        height: 130px;
+    }
+
+    .neo-gauge-value {
+        font-size: 2.2rem;
+    }
+}
+
+/* Respect Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+        animation-delay: -1ms !important;
+        animation-duration: 1ms !important;
+        animation-iteration-count: 1 !important;
+        background-attachment: initial !important;
+        scroll-behavior: auto !important;
+        transition-delay: 0s !important;
+        transition-duration: 0s !important;
+    }
+}
+
+/* Print Optimization */
+@media print {
+    body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    .neo-navbar, .neo-footer, .btn-neo, .neo-alert {
+        display: none !important;
+    }
+    .neo-card, .neo-result-hero, .neo-inset-box {
+        box-shadow: none !important;
+        border: 1px solid #ccc !important;
+        background: #fff !important;
+    }
+}

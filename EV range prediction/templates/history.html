@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+
+{% block title %}My Prediction History - EV Range Telemetry{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header Section -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Driver Telemetry Log</span>
+            <h2 class="fw-extrabold text-neo-primary mb-1">
+                <i class="bi bi-clock-history text-neo-emerald me-2"></i>My Prediction History
+            </h2>
+            <p class="text-neo-secondary small mb-0">Review past range estimations and operational conditions associated strictly with your account.</p>
+        </div>
+
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('dashboard') }}" class="btn-neo btn-neo-primary btn-neo-pill">
+                <i class="bi bi-plus-lg"></i> New Prediction
+            </a>
+            {% if predictions %}
+                <form method="POST" action="{{ url_for('history_clear') }}" onsubmit="return confirm('Clear your entire prediction history?');">
+                    <button type="submit" class="btn-neo btn-neo-pill text-neo-danger">
+                        <i class="bi bi-trash3"></i> Clear History
+                    </button>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Predictions History List -->
+    {% if predictions %}
+        <div class="neo-card neo-card-lg">
+            <div class="neo-table-wrapper">
+                <table class="neo-table">
+                    <thead>
+                        <tr>
+                            <th>Date / Time</th>
+                            <th>Vehicle Architecture</th>
+                            <th>State of Charge</th>
+                            <th>Trip Conditions</th>
+                            <th>Predicted Range</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for p in predictions %}
+                            <tr>
+                                <td>
+                                    <span class="small fw-bold text-neo-primary d-block">{{ p.created_at.strftime('%d %b %Y') }}</span>
+                                    <span class="small text-neo-muted">{{ p.created_at.strftime('%H:%M') }}</span>
+                                </td>
+                                <td>
+                                    <strong class="text-neo-primary d-block">{{ p.manufacturer }} {{ p.model }}</strong>
+                                    <span class="small text-neo-muted">{{ p.variant_name }}</span>
+                                </td>
+                                <td>
+                                    <span class="neo-badge neo-badge-inset text-neo-accent fw-bold">{{ p.battery_percentage }}% SoC</span>
+                                </td>
+                                <td>
+                                    <span class="small text-neo-secondary d-block">{{ p.average_speed }} km/h &bull; {{ p.ambient_temperature }}°C</span>
+                                    <span class="small text-neo-muted">{{ p.driving_style }} &bull; {{ p.traffic_condition }}</span>
+                                </td>
+                                <td>
+                                    <div class="fs-5 fw-extrabold text-neo-emerald">
+                                        {{ p.predicted_range }} <small class="fs-6 text-neo-muted">km</small>
+                                    </div>
+                                    <span class="small text-neo-muted">{{ p.efficiency_wh_km }} Wh/km</span>
+                                </td>
+                                <td class="text-end">
+                                    <div class="d-inline-flex gap-1">
+                                        <button type="button" class="btn-neo btn-neo-pill small text-neo-accent" onclick="showHistoryModal({{ p.id }})" title="View complete telemetry details">
+                                            <i class="bi bi-eye"></i> Details
+                                        </button>
+                                        <form method="POST" action="{{ url_for('history_delete', prediction_id=p.id) }}" class="d-inline" onsubmit="return confirm('Delete this prediction record?');">
+                                            <button type="submit" class="btn-neo btn-neo-pill small text-neo-danger" title="Delete record">
+                                                <i class="bi bi-trash3"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="neo-card neo-card-lg text-center py-5">
+            <div class="neo-brand-icon mx-auto mb-3" style="width: 70px; height: 70px;">
+                <i class="bi bi-clock-history fs-2 text-neo-accent"></i>
+            </div>
+            <h4 class="fw-bold text-neo-primary mb-2">No Prediction Records Found</h4>
+            <p class="text-neo-secondary max-w-500 mx-auto mb-4">
+                You haven't run any range predictions yet. Open the EV Cockpit, configure your trip conditions, and your estimates will be automatically archived here.
+            </p>
+            <a href="{{ url_for('dashboard') }}" class="btn-neo btn-neo-gradient px-4 py-2.5">
+                <i class="bi bi-speedometer2"></i> Open Prediction Cockpit
+            </a>
+        </div>
+    {% endif %}
+
+</div>
+
+<!-- Neumorphic History Detail Modal -->
+<div class="modal fade" id="historyDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content neo-card neo-card-lg border-0">
+            <div class="modal-header border-0 pb-0">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="neo-brand-icon" style="width: 38px; height: 38px;">
+                        <i class="bi bi-card-checklist text-neo-accent"></i>
+                    </div>
+                    <h5 class="fw-bold text-neo-primary mb-0" id="modalVehicleTitle">Trip Telemetry Breakdown</h5>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+
+            <div class="modal-body py-4">
+                <!-- Large Range Callout -->
+                <div class="neo-inset-box text-center py-3 mb-4">
+                    <span class="small text-neo-muted d-block text-uppercase fw-bold letter-spacing-1">Predicted Real-World Range</span>
+                    <div class="display-6 fw-extrabold text-neo-emerald" id="modalPredictedRange">- km</div>
+                    <span class="small text-neo-secondary" id="modalTimestamp">-</span>
+                </div>
+
+                <!-- Parameters Table -->
+                <div class="neo-table-wrapper">
+                    <table class="neo-table">
+                        <tbody id="modalTableBody">
+                            <!-- Populated dynamically via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn-neo btn-neo-pill" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function showHistoryModal(predId) {
+    fetch(`/api/history/${predId}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Network error or access denied');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('modalVehicleTitle').textContent = `${data.vehicle} (${data.variant_name})`;
+            document.getElementById('modalPredictedRange').textContent = `${data.predicted_range} km`;
+            document.getElementById('modalTimestamp').textContent = `Archived on ${data.created_at}`;
+
+            const tbody = document.getElementById('modalTableBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td class="text-neo-muted w-50">Battery State of Charge</td>
+                    <td class="fw-bold text-neo-accent">${data.battery_percentage}% SoC</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Average Trip Speed</td>
+                    <td class="fw-semibold text-neo-primary">${data.average_speed} km/h</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Ambient Outside Temperature</td>
+                    <td class="fw-semibold text-neo-primary">${data.ambient_temperature} °C</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Traffic Flow Condition</td>
+                    <td class="fw-semibold text-neo-primary">${data.traffic_condition}</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Route Terrain Profile</td>
+                    <td class="fw-semibold text-neo-primary">${data.terrain}</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Driving Style Profile</td>
+                    <td class="fw-semibold text-neo-primary">${data.driving_style}</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Cabin HVAC Aux Draw</td>
+                    <td class="fw-semibold text-neo-primary">${data.hvac_usage}</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Passenger Occupants</td>
+                    <td class="fw-semibold text-neo-primary">${data.passenger_count} Person(s)</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Battery Degradation Age</td>
+                    <td class="fw-semibold text-neo-primary">${data.battery_age} Years</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Tyre Pressure Status</td>
+                    <td class="fw-semibold text-neo-primary">${data.tyre_pressure_status}</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Specific Consumption</td>
+                    <td class="fw-bold text-neo-primary">${data.efficiency_wh_km} Wh/km</td>
+                </tr>
+                <tr>
+                    <td class="text-neo-muted">Theoretical 100% SoC Range</td>
+                    <td class="fw-bold text-neo-primary">${data.theoretical_full_range} km</td>
+                </tr>
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('historyDetailModal'));
+            modal.show();
+        })
+        .catch(err => {
+            alert('Failed to load telemetry details.');
+            console.error(err);
+        });
+}
+</script>
+{% endblock %}

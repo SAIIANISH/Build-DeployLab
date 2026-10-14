@@ -1,0 +1,549 @@
+{
+  "manufacturers": [
+    {
+      "name": "Tata Motors",
+      "models": [
+        {
+          "name": "Nexon EV",
+          "variants": [
+            {
+              "id": "tata_nexon_empowered_lr",
+              "name": "Empowered+ LR (Long Range)",
+              "battery_capacity_kwh": 45.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 106.6,
+              "torque_nm": 215,
+              "curb_weight_kg": 1450,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 489,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "350 - 375 km",
+              "reference_source": "Tata C75 Standard / Autocar India Mixed Road Test (~350 km)"
+            },
+            {
+              "id": "tata_nexon_creative_mr",
+              "name": "Creative+ MR (Medium Range)",
+              "battery_capacity_kwh": 30.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 95.0,
+              "torque_nm": 215,
+              "curb_weight_kg": 1400,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 325,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "220 - 240 km",
+              "reference_source": "Tata C75 Standard Real-World Cycle"
+            }
+          ]
+        },
+        {
+          "name": "Punch EV",
+          "variants": [
+            {
+              "id": "tata_punch_empowered_lr",
+              "name": "Empowered+ S LR",
+              "battery_capacity_kwh": 35.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 90.0,
+              "torque_nm": 190,
+              "curb_weight_kg": 1340,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 421,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "270 - 290 km",
+              "reference_source": "Tata C75 Standard / Autocar India Real-World Test (~275 km)"
+            },
+            {
+              "id": "tata_punch_smart_mr",
+              "name": "Smart+ MR",
+              "battery_capacity_kwh": 25.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 60.0,
+              "torque_nm": 114,
+              "curb_weight_kg": 1260,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 315,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "190 - 210 km",
+              "reference_source": "Tata C75 Standard Real-World Cycle"
+            }
+          ]
+        },
+        {
+          "name": "Tiago EV",
+          "variants": [
+            {
+              "id": "tata_tiago_xz_lux_lr",
+              "name": "XZ+ Tech LUX Long Range",
+              "battery_capacity_kwh": 24.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 55.0,
+              "torque_nm": 114,
+              "curb_weight_kg": 1155,
+              "drivetrain": "FWD",
+              "body_type": "Hatchback",
+              "official_range_km": 315,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "180 - 200 km",
+              "reference_source": "Tata C75 Standard / Autocar India Real-World Test (~185 km)"
+            },
+            {
+              "id": "tata_tiago_xe_mr",
+              "name": "XE Medium Range",
+              "battery_capacity_kwh": 19.2,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 45.0,
+              "torque_nm": 110,
+              "curb_weight_kg": 1110,
+              "drivetrain": "FWD",
+              "body_type": "Hatchback",
+              "official_range_km": 250,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "140 - 160 km",
+              "reference_source": "Tata C75 Standard Real-World Cycle"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Mahindra",
+      "models": [
+        {
+          "name": "XUV400 EV",
+          "variants": [
+            {
+              "id": "mahindra_xuv400_el_pro",
+              "name": "EL Pro 39.4 kWh",
+              "battery_capacity_kwh": 39.4,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 110.0,
+              "torque_nm": 310,
+              "curb_weight_kg": 1578,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 456,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "280 - 305 km",
+              "reference_source": "Autocar India Real-World Road Test (~285 km)"
+            },
+            {
+              "id": "mahindra_xuv400_ec_pro",
+              "name": "EC Pro 34.5 kWh",
+              "battery_capacity_kwh": 34.5,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 110.0,
+              "torque_nm": 310,
+              "curb_weight_kg": 1530,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 375,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "240 - 260 km",
+              "reference_source": "Real-World Mixed Drive Cycle Benchmark"
+            }
+          ]
+        },
+        {
+          "name": "BE 6e",
+          "variants": [
+            {
+              "id": "mahindra_be6e_pack1",
+              "name": "Pack 1 (59 kWh)",
+              "battery_capacity_kwh": 59.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 170.0,
+              "torque_nm": 380,
+              "curb_weight_kg": 1910,
+              "drivetrain": "RWD",
+              "body_type": "SUV",
+              "official_range_km": 550,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "410 - 450 km",
+              "reference_source": "WLTP Real-World Equivalent Estimate"
+            }
+          ]
+        },
+        {
+          "name": "XEV 9e",
+          "variants": [
+            {
+              "id": "mahindra_xev9e_pack1",
+              "name": "Pack 1 (79 kWh)",
+              "battery_capacity_kwh": 79.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 210.0,
+              "torque_nm": 380,
+              "curb_weight_kg": 2080,
+              "drivetrain": "RWD",
+              "body_type": "SUV",
+              "official_range_km": 656,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "500 - 550 km",
+              "reference_source": "WLTP Real-World Equivalent Estimate"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MG Motor",
+      "models": [
+        {
+          "name": "ZS EV",
+          "variants": [
+            {
+              "id": "mg_zs_ev_exclusive",
+              "name": "Exclusive Plus (50.3 kWh)",
+              "battery_capacity_kwh": 50.3,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 130.0,
+              "torque_nm": 280,
+              "curb_weight_kg": 1620,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 461,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "320 - 350 km",
+              "reference_source": "Autocar India Real-World Road Test (~325 km) / WLTP Real ~340 km"
+            }
+          ]
+        },
+        {
+          "name": "Windsor EV",
+          "variants": [
+            {
+              "id": "mg_windsor_essence",
+              "name": "Essence (38 kWh)",
+              "battery_capacity_kwh": 37.9,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 100.0,
+              "torque_nm": 200,
+              "curb_weight_kg": 1580,
+              "drivetrain": "FWD",
+              "body_type": "Crossover",
+              "official_range_km": 331,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "240 - 265 km",
+              "reference_source": "Real-World City/Highway Composite Test"
+            }
+          ]
+        },
+        {
+          "name": "Comet EV",
+          "variants": [
+            {
+              "id": "mg_comet_plush",
+              "name": "Plush (17.3 kWh)",
+              "battery_capacity_kwh": 17.3,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 31.0,
+              "torque_nm": 110,
+              "curb_weight_kg": 815,
+              "drivetrain": "RWD",
+              "body_type": "Hatchback",
+              "official_range_km": 230,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "160 - 180 km",
+              "reference_source": "Autocar India Real-World Urban Test (~165 km)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Hyundai",
+      "models": [
+        {
+          "name": "Ioniq 5",
+          "variants": [
+            {
+              "id": "hyundai_ioniq5_lr_rwd",
+              "name": "Long Range RWD (72.6 kWh)",
+              "battery_capacity_kwh": 72.6,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 160.0,
+              "torque_nm": 350,
+              "curb_weight_kg": 1910,
+              "drivetrain": "RWD",
+              "body_type": "Crossover",
+              "official_range_km": 631,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "450 - 480 km",
+              "reference_source": "Autocar India Real-World Road Test (~465 km) / EPA 488 km"
+            }
+          ]
+        },
+        {
+          "name": "Kona Electric",
+          "variants": [
+            {
+              "id": "hyundai_kona_premium",
+              "name": "Premium (39.2 kWh)",
+              "battery_capacity_kwh": 39.2,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 100.0,
+              "torque_nm": 395,
+              "curb_weight_kg": 1535,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 452,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "290 - 310 km",
+              "reference_source": "Autocar India Real-World Test (~295 km)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Kia",
+      "models": [
+        {
+          "name": "EV6",
+          "variants": [
+            {
+              "id": "kia_ev6_gt_line_awd",
+              "name": "GT-Line AWD (77.4 kWh)",
+              "battery_capacity_kwh": 77.4,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 239.0,
+              "torque_nm": 605,
+              "curb_weight_kg": 2105,
+              "drivetrain": "AWD",
+              "body_type": "Crossover",
+              "official_range_km": 708,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "460 - 500 km",
+              "reference_source": "Autocar India Road Test (~470 km) / EPA 441 km"
+            },
+            {
+              "id": "kia_ev6_gt_line_rwd",
+              "name": "GT-Line RWD (77.4 kWh)",
+              "battery_capacity_kwh": 77.4,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 168.0,
+              "torque_nm": 350,
+              "curb_weight_kg": 1980,
+              "drivetrain": "RWD",
+              "body_type": "Crossover",
+              "official_range_km": 528,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "480 - 520 km",
+              "reference_source": "WLTP Real ~490 km / EPA 499 km"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BYD",
+      "models": [
+        {
+          "name": "Atto 3",
+          "variants": [
+            {
+              "id": "byd_atto3_extended",
+              "name": "Superior Extended (60.5 kWh)",
+              "battery_capacity_kwh": 60.5,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 150.0,
+              "torque_nm": 310,
+              "curb_weight_kg": 1750,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 521,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "370 - 400 km",
+              "reference_source": "Autocar India Real-World Road Test (~380 km) / WLTP Real ~385 km"
+            },
+            {
+              "id": "byd_atto3_dynamic",
+              "name": "Dynamic Standard (49.9 kWh)",
+              "battery_capacity_kwh": 49.9,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 150.0,
+              "torque_nm": 310,
+              "curb_weight_kg": 1680,
+              "drivetrain": "FWD",
+              "body_type": "SUV",
+              "official_range_km": 468,
+              "range_test_cycle": "ARAI",
+              "real_world_reference_km": "310 - 335 km",
+              "reference_source": "WLTP Real-World Composite Rating (~325 km)"
+            }
+          ]
+        },
+        {
+          "name": "Seal",
+          "variants": [
+            {
+              "id": "byd_seal_premium_rwd",
+              "name": "Premium RWD (82.5 kWh)",
+              "battery_capacity_kwh": 82.5,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 230.0,
+              "torque_nm": 360,
+              "curb_weight_kg": 2055,
+              "drivetrain": "RWD",
+              "body_type": "Sedan",
+              "official_range_km": 570,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "500 - 540 km",
+              "reference_source": "EV-Database Global Real-World Benchmark (~515 km)"
+            },
+            {
+              "id": "byd_seal_performance_awd",
+              "name": "Performance AWD (82.5 kWh)",
+              "battery_capacity_kwh": 82.5,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 390.0,
+              "torque_nm": 670,
+              "curb_weight_kg": 2185,
+              "drivetrain": "AWD",
+              "body_type": "Sedan",
+              "official_range_km": 520,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "460 - 500 km",
+              "reference_source": "EV-Database Global Real-World Benchmark (~475 km)"
+            },
+            {
+              "id": "byd_seal_dynamic_rwd",
+              "name": "Dynamic RWD (61.4 kWh)",
+              "battery_capacity_kwh": 61.4,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 150.0,
+              "torque_nm": 310,
+              "curb_weight_kg": 1920,
+              "drivetrain": "RWD",
+              "body_type": "Sedan",
+              "official_range_km": 460,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "380 - 410 km",
+              "reference_source": "EV-Database Global Real-World Benchmark (~390 km)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tesla",
+      "models": [
+        {
+          "name": "Model 3",
+          "variants": [
+            {
+              "id": "tesla_model3_std_rwd",
+              "name": "Standard RWD (60 kWh)",
+              "battery_capacity_kwh": 60.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 208.0,
+              "torque_nm": 420,
+              "curb_weight_kg": 1765,
+              "drivetrain": "RWD",
+              "body_type": "Sedan",
+              "official_range_km": 513,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "420 - 450 km",
+              "reference_source": "EV-Database Real-World Benchmark (415 km) / EPA Rating (438 km)"
+            },
+            {
+              "id": "tesla_model3_lr_awd",
+              "name": "Long Range AWD (78.1 kWh)",
+              "battery_capacity_kwh": 78.1,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 366.0,
+              "torque_nm": 510,
+              "curb_weight_kg": 1828,
+              "drivetrain": "AWD",
+              "body_type": "Sedan",
+              "official_range_km": 629,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "480 - 530 km",
+              "reference_source": "EV-Database Real-World Benchmark (495 km) / EPA Rating (548 km)"
+            }
+          ]
+        },
+        {
+          "name": "Model Y",
+          "variants": [
+            {
+              "id": "tesla_modely_lr_awd",
+              "name": "Long Range AWD (78.1 kWh)",
+              "battery_capacity_kwh": 78.1,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 378.0,
+              "torque_nm": 510,
+              "curb_weight_kg": 1979,
+              "drivetrain": "AWD",
+              "body_type": "SUV",
+              "official_range_km": 533,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "430 - 475 km",
+              "reference_source": "EV-Database Real-World Benchmark (435 km) / EPA Rating (496 km)"
+            },
+            {
+              "id": "tesla_modely_std_rwd",
+              "name": "Standard RWD (60 kWh)",
+              "battery_capacity_kwh": 60.0,
+              "battery_chemistry": "LFP",
+              "motor_power_kw": 220.0,
+              "torque_nm": 420,
+              "curb_weight_kg": 1909,
+              "drivetrain": "RWD",
+              "body_type": "SUV",
+              "official_range_km": 455,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "360 - 395 km",
+              "reference_source": "EV-Database Real-World Benchmark (365 km) / EPA Rating (393 km)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "BMW",
+      "models": [
+        {
+          "name": "i4",
+          "variants": [
+            {
+              "id": "bmw_i4_edrive40",
+              "name": "eDrive40 Gran Coupe (80.7 kWh)",
+              "battery_capacity_kwh": 80.7,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 250.0,
+              "torque_nm": 430,
+              "curb_weight_kg": 2125,
+              "drivetrain": "RWD",
+              "body_type": "Sedan",
+              "official_range_km": 590,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "450 - 495 km",
+              "reference_source": "EV-Database Real-World Benchmark (460 km) / EPA Rating (484 km)"
+            },
+            {
+              "id": "bmw_i4_m50",
+              "name": "M50 Performance AWD (80.7 kWh)",
+              "battery_capacity_kwh": 80.7,
+              "battery_chemistry": "NMC",
+              "motor_power_kw": 400.0,
+              "torque_nm": 795,
+              "curb_weight_kg": 2290,
+              "drivetrain": "AWD",
+              "body_type": "Sedan",
+              "official_range_km": 510,
+              "range_test_cycle": "WLTP",
+              "real_world_reference_km": "400 - 445 km",
+              "reference_source": "EV-Database Real-World Benchmark (420 km) / EPA Rating (436 km)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

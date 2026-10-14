@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - EV Range Prediction Cockpit{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7 col-lg-5">
+            <div class="neo-card neo-card-lg">
+                <div class="text-center mb-4">
+                    <div class="neo-brand-icon mx-auto mb-3" style="width: 58px; height: 58px;">
+                        <i class="bi bi-shield-lock-fill fs-4 text-neo-accent"></i>
+                    </div>
+                    <h3 class="fw-bold text-neo-primary mb-1">Driver Sign In</h3>
+                    <p class="text-neo-secondary small">Access your personal EV Cockpit, Garage, and Predictions</p>
+                </div>
+
+                <form method="POST" action="{{ url_for('login') }}">
+                    <div class="neo-input-group mb-3">
+                        <label for="identifier" class="neo-label">Username or Email</label>
+                        <div class="position-relative">
+                            <input type="text" class="neo-input" id="identifier" name="identifier" placeholder="e.g. Pheonix or driver@example.com" required autofocus>
+                        </div>
+                    </div>
+
+                    <div class="neo-input-group mb-4">
+                        <label for="password" class="neo-label">Password</label>
+                        <div class="position-relative">
+                            <input type="password" class="neo-input" id="password" name="password" placeholder="Enter your password" required>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-neo btn-neo-gradient w-100 py-3 mb-3">
+                        <i class="bi bi-box-arrow-in-right"></i> Sign In to Cockpit
+                    </button>
+                </form>
+
+                <div class="text-center pt-3 border-top border-secondary-subtle">
+                    <span class="small text-neo-muted">Need a driver account?</span>
+                    <a href="{{ url_for('register') }}" class="small fw-bold text-neo-accent ms-1">Create Account</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

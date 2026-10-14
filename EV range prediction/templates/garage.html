@@ -1,0 +1,210 @@
+{% extends 'base.html' %}
+
+{% block title %}My EV Garage - Saved Electric Vehicles{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+    <!-- Header Section -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+            <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase letter-spacing-1 mb-2">Driver Collection</span>
+            <h2 class="fw-extrabold text-neo-primary mb-1">
+                <i class="bi bi-car-front-fill text-neo-accent me-2"></i>My EV Garage
+            </h2>
+            <p class="text-neo-secondary small mb-0">Manage your daily electric vehicles. Saved EVs can be selected with one click in the prediction cockpit.</p>
+        </div>
+        <button class="btn-neo btn-neo-primary" type="button" data-bs-toggle="collapse" data-bs-target="#addVehicleCollapse">
+            <i class="bi bi-plus-circle-fill"></i> Add EV to Garage
+        </button>
+    </div>
+
+    <!-- Collapsible Add Vehicle Form -->
+    <div class="collapse mb-5" id="addVehicleCollapse">
+        <div class="neo-card neo-card-lg">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold text-neo-primary mb-0">
+                    <i class="bi bi-bookmark-plus text-neo-accent me-2"></i>Save a Verified BEV to Your Garage
+                </h5>
+                <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#addVehicleCollapse"></button>
+            </div>
+            <p class="text-neo-secondary small mb-4">Choose from our verified OEM catalogue. All technical specifications are automatically associated with your driver account.</p>
+
+            <form method="POST" action="{{ url_for('garage_add') }}">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="g_mfgSelect" class="neo-label">Manufacturer</label>
+                        <select class="neo-select" id="g_mfgSelect" required onchange="onGarageMfgChanged()">
+                            <option value="" disabled selected>-- Select Manufacturer --</option>
+                            {% for mfg in catalogue.manufacturers %}
+                                <option value="{{ mfg.name }}">{{ mfg.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="g_modelSelect" class="neo-label">Model</label>
+                        <select class="neo-select" id="g_modelSelect" required disabled onchange="onGarageModelChanged()">
+                            <option value="" disabled selected>-- Select Model --</option>
+                        </select>
+                    </div>
+
+                    <div class="col-md-4">
+                        <label for="g_variantSelect" class="neo-label">Variant / Trim</label>
+                        <select class="neo-select" id="g_variantSelect" name="variant_id" required disabled>
+                            <option value="" disabled selected>-- Select Variant --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 text-end">
+                    <button type="submit" class="btn-neo btn-neo-gradient px-4 py-2.5">
+                        <i class="bi bi-check-lg"></i> Save Vehicle
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Saved Vehicles Grid -->
+    {% if vehicles %}
+        <div class="row g-4">
+            {% for v in vehicles %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="neo-garage-card {% if v.is_default %}is-default{% endif %}">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="neo-badge neo-badge-inset text-neo-accent text-uppercase">
+                                    {{ v.manufacturer }}
+                                </span>
+                                {% if v.is_default %}
+                                    <span class="neo-badge text-neo-emerald fw-bold">
+                                        <i class="bi bi-star-fill"></i> Default EV
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <h4 class="fw-bold text-neo-primary mb-1">{{ v.model }}</h4>
+                            <p class="text-neo-secondary small mb-3">{{ v.variant_name }}</p>
+
+                            <!-- Specifications Inset Box -->
+                            <div class="neo-inset-box neo-inset-box-sm mb-3">
+                                <div class="row g-2 small">
+                                    <div class="col-6">
+                                        <span class="text-neo-muted d-block">Battery Pack</span>
+                                        <strong class="text-neo-primary">{{ v.battery_capacity_kwh }} kWh ({{ v.battery_chemistry }})</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-neo-muted d-block">Peak Motor</span>
+                                        <strong class="text-neo-primary">{{ v.motor_power_kw }} kW</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-neo-muted d-block">Drivetrain</span>
+                                        <strong class="text-neo-primary">{{ v.drivetrain }} &bull; {{ v.body_type }}</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <span class="text-neo-muted d-block">Lab Range</span>
+                                        <strong class="text-neo-emerald">{{ v.official_range_km }} km</strong>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card Action Buttons -->
+                        <div class="pt-2 border-top border-secondary-subtle">
+                            <div class="d-flex justify-content-between align-items-center gap-2">
+                                <a href="{{ url_for('dashboard') }}" class="btn-neo btn-neo-pill small text-neo-accent">
+                                    <i class="bi bi-speedometer2"></i> Cockpit
+                                </a>
+
+                                <div class="d-flex gap-1">
+                                    {% if not v.is_default %}
+                                        <form method="POST" action="{{ url_for('garage_set_default', vehicle_id=v.id) }}">
+                                            <button type="submit" class="btn-neo btn-neo-pill small" title="Set as default vehicle">
+                                                <i class="bi bi-star"></i> Set Default
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                    <form method="POST" action="{{ url_for('garage_delete', vehicle_id=v.id) }}" onsubmit="return confirm('Remove {{ v.manufacturer }} {{ v.model }} from your garage? Historical prediction records will remain safe.');">
+                                        <button type="submit" class="btn-neo btn-neo-pill small text-neo-danger" title="Remove vehicle">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <!-- Empty State -->
+        <div class="neo-card neo-card-lg text-center py-5">
+            <div class="neo-brand-icon mx-auto mb-3" style="width: 70px; height: 70px;">
+                <i class="bi bi-ev-front fs-2 text-neo-accent"></i>
+            </div>
+            <h4 class="fw-bold text-neo-primary mb-2">Your Garage is Empty</h4>
+            <p class="text-neo-secondary max-w-500 mx-auto mb-4">
+                Save your electric vehicle to your personal driver profile. Once saved, it will be automatically selected whenever you launch the range prediction cockpit.
+            </p>
+            <button class="btn-neo btn-neo-gradient px-4 py-2.5" type="button" data-bs-toggle="collapse" data-bs-target="#addVehicleCollapse">
+                <i class="bi bi-plus-circle-fill"></i> Add Your First Electric Vehicle
+            </button>
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const garageCatalogue = {{ catalogue | tojson }};
+
+function onGarageMfgChanged() {
+    const mfgSelect = document.getElementById('g_mfgSelect');
+    const modelSelect = document.getElementById('g_modelSelect');
+    const variantSelect = document.getElementById('g_variantSelect');
+    const selectedMfg = mfgSelect.value;
+
+    modelSelect.innerHTML = '<option value="" disabled selected>-- Select Model --</option>';
+    variantSelect.innerHTML = '<option value="" disabled selected>-- Select Variant --</option>';
+    variantSelect.disabled = true;
+
+    const mfgData = garageCatalogue.manufacturers.find(m => m.name === selectedMfg);
+    if (mfgData && mfgData.models) {
+        mfgData.models.forEach(mod => {
+            const opt = document.createElement('option');
+            opt.value = mod.name;
+            opt.textContent = mod.name;
+            modelSelect.appendChild(opt);
+        });
+        modelSelect.disabled = false;
+    }
+}
+
+function onGarageModelChanged() {
+    const mfgSelect = document.getElementById('g_mfgSelect');
+    const modelSelect = document.getElementById('g_modelSelect');
+    const variantSelect = document.getElementById('g_variantSelect');
+
+    const selectedMfg = mfgSelect.value;
+    const selectedModel = modelSelect.value;
+
+    variantSelect.innerHTML = '<option value="" disabled selected>-- Select Variant --</option>';
+
+    const mfgData = garageCatalogue.manufacturers.find(m => m.name === selectedMfg);
+    if (mfgData) {
+        const modelData = mfgData.models.find(m => m.name === selectedModel);
+        if (modelData && modelData.variants) {
+            modelData.variants.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id;
+                opt.textContent = `${v.name} (${v.battery_capacity_kwh} kWh)`;
+                variantSelect.appendChild(opt);
+            });
+            variantSelect.disabled = false;
+        }
+    }
+}
+</script>
+{% endblock %}
